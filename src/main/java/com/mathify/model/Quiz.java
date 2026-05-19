@@ -4,37 +4,55 @@
  */
 package com.mathify.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
- * @author ASUS
+ * @author Akari
  */
 public class Quiz implements Gradable {
+
     private String quizId;
-    private List<String> questions;
+    private List<Question> questionsList;
+    private float score;
 
     public Quiz() {
+
+        questionsList = new ArrayList<>();
     }
 
     public Quiz(String quizId,
-                List<String> questions) {
+                float score) {
 
         this.quizId = quizId;
-        this.questions = questions;
+        this.score = score;
+        questionsList = new ArrayList<>();
     }
 
     @Override
     public float getScore() {
 
-        return 85;
+        return score;
     }
 
     @Override
     public boolean isPassed() {
 
-        return getScore() >= 75;
+        return score >= 75;
     }
 
-    // Getter Setter
+    @Override
+    public int getTotalQuestions() {
+
+        return questionsList.size();
+    }
+
+    public void addQuestion(Question question) {
+
+        questionsList.add(question);
+    }
+
     public String getQuizId() {
         return quizId;
     }
@@ -43,11 +61,15 @@ public class Quiz implements Gradable {
         this.quizId = quizId;
     }
 
-    public List<String> getQuestions() {
-        return questions;
+    public List<Question> getQuestionsList() {
+        return questionsList;
     }
 
-    public void setQuestions(List<String> questions) {
-        this.questions = questions;
+    public void setQuestionsList(List<Question> questionsList) {
+        this.questionsList = questionsList;
+    }
+
+    public void setScore(float score) {
+        this.score = score;
     }
 }
