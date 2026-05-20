@@ -10,13 +10,13 @@ import java.util.List;
  *
  * @author Akari
  */
-public class Question {
+public abstract class Question {
     private String questionId;
     private String questionText;
-    private List<String> options;
-    private String correctAnswer;
-    private String explanation;
     private int difficulty;
+    private String imageUrl;
+    private String explanation;
+    private String hint;
 
     public Question() {
     }
@@ -35,6 +35,8 @@ public class Question {
         this.explanation = explanation;
         this.difficulty = difficulty;
     }
+  
+    public abstract boolean checkAnswer(String answer)
 
     // Getter Setter
     public String getQuestionId() {
@@ -51,22 +53,6 @@ public class Question {
 
     public void setQuestionText(String questionText) {
         this.questionText = questionText;
-    }
-
-    public List<String> getOptions() {
-        return options;
-    }
-
-    public void setOptions(List<String> options) {
-        this.options = options;
-    }
-
-    public String getCorrectAnswer() {
-        return correctAnswer;
-    }
-
-    public void setCorrectAnswer(String correctAnswer) {
-        this.correctAnswer = correctAnswer;
     }
 
     public String getExplanation() {

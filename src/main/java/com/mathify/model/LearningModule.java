@@ -11,22 +11,17 @@ package com.mathify.model;
 public class LearningModule implements Playable {
 
     private String moduleId;
-    private String moduleType;
+    private enum Type{VIDEO, TEXT, INTERACTIVE, EXECISE};
     private int durationMinutes;
-    private String content;
+    private int orderIndex;
 
-    public LearningModule() {
-    }
+    @Override
+    public void start(){}
 
-    public LearningModule(String moduleId,
-                          String moduleType,
-                          int durationMinutes,
-                          String content) {
-
-        this.moduleId = moduleId;
-        this.moduleType = moduleType;
-        this.durationMinutes = durationMinutes;
-        this.content = content;
+    public LearningModule(String id, int duration, int orderIndex){
+        moduleId = id;
+        durationMinutes = duration;
+        this.orderIndex = orderIndex;
     }
 
     @Override
@@ -47,10 +42,6 @@ public class LearningModule implements Playable {
         System.out.println("Module dihentikan");
     }
 
-    public String getContent() {
-
-        return content;
-    }
 
     public String getModuleId() {
         return moduleId;
@@ -60,23 +51,11 @@ public class LearningModule implements Playable {
         this.moduleId = moduleId;
     }
 
-    public String getModuleType() {
-        return moduleType;
-    }
-
-    public void setModuleType(String moduleType) {
-        this.moduleType = moduleType;
-    }
-
     public int getDurationMinutes() {
         return durationMinutes;
     }
 
     public void setDurationMinutes(int durationMinutes) {
         this.durationMinutes = durationMinutes;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 }
