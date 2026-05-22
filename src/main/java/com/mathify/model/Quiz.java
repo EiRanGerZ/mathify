@@ -2,7 +2,7 @@ package com.mathify.model;
 
 import java.util.ArrayList;
 
-public abstract class Quiz implements Gradeable{
+public abstract class Quiz {
     private String quizId;
     private ArrayList<Question> question;
     

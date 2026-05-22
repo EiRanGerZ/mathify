@@ -36,7 +36,7 @@ public abstract class Question {
         this.difficulty = difficulty;
     }
   
-    public abstract boolean checkAnswer(String answer)
+    public abstract boolean checkAnswer(String answer);
 
     // Getter Setter
     public String getQuestionId() {
