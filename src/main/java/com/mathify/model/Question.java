@@ -14,9 +14,7 @@ public abstract class Question {
     private String questionId;
     private String questionText;
     private int difficulty;
-    private String imageUrl;
     private String explanation;
-    private String hint;
 
     public Question() {
     }
