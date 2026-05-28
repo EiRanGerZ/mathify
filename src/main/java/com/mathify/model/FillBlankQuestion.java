@@ -1,27 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mathify.model;
 
-/**
- *
- * @author ACER
- */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class FillBlankQuestion implements Question {
 
     private final QuestionInfo info;
-    private final String correctAnswer;
 
-    public FillBlankQuestion(QuestionInfo info, String correctAnswer) {
+    /**
+     * Satu prompt bisa punya lebih dari satu blank, misal: "__ adalah ibu kota
+     * __".
+     */
+    private final List<String> correctAnswers;
+
+    private final boolean caseSensitive;
+
+    public FillBlankQuestion(QuestionInfo info, List<String> correctAnswers, boolean caseSensitive) {
         if (info == null) {
             throw new IllegalArgumentException("info must not be null");
         }
-        if (correctAnswer == null || correctAnswer.isBlank()) {
-            throw new IllegalArgumentException("correctAnswer must not be blank");
+        if (correctAnswers == null || correctAnswers.isEmpty()) {
+            throw new IllegalArgumentException("correctAnswers must not be empty");
         }
+
         this.info = info;
-        this.correctAnswer = correctAnswer;
+        this.correctAnswers = Collections.unmodifiableList(new ArrayList<>(correctAnswers));
+        this.caseSensitive = caseSensitive;
     }
 
     @Override
@@ -34,20 +39,47 @@ public class FillBlankQuestion implements Question {
         return QuestionType.FILL_BLANK;
     }
 
-    public String getAnswer() {
-        return correctAnswer;
+    public List<String> getCorrectAnswers() {
+        return correctAnswers;
     }
 
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    /**
+     * Evaluasi jawaban student. Semua blank harus diisi dengan benar dan
+     * urutannya harus sesuai.
+     */
     @Override
-    public boolean evaluate(String answer) {
-        if (answer == null) {
+    public boolean evaluate(Answer answer) {
+        if (!(answer instanceof Answer.FillBlankAnswer fba)) {
             return false;
         }
-        return correctAnswer.equalsIgnoreCase(answer.trim());
+
+        List<String> filled = fba.filledValues();
+        if (filled.size() != correctAnswers.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < correctAnswers.size(); i++) {
+            String correct = correctAnswers.get(i).trim();
+            String submitted = filled.get(i).trim();
+
+            boolean match = caseSensitive
+                    ? correct.equals(submitted)
+                    : correct.equalsIgnoreCase(submitted);
+
+            if (!match) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public String toString() {
-        return "FillBlankQuestion{id='" + info.id() + "', correctAnswer='" + correctAnswer + "'}";
+        return "FillBlankQuestion{id='" + info.id() + "', blanks=" + correctAnswers.size()
+                + ", caseSensitive=" + caseSensitive + '}';
     }
 }
