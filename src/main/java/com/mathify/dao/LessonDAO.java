@@ -4,7 +4,7 @@
  */
 package com.mathify.dao;
 
-import com.mathify.model.Lesson;
+import com.mathify.model.Chapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,28 +14,28 @@ import java.util.List;
  * @author Akari
  */
 public class LessonDAO {
-    private static List<Lesson> lessonList =
+    private static List<Chapter> chapterList =
             new ArrayList<>();
 
-    public void addLesson(Lesson lesson) {
+    public void addLesson(Chapter chapter) {
 
-        lessonList.add(lesson);
+        chapterList.add(chapter);
 
         System.out.println("Lesson berhasil ditambahkan!");
     }
 
-    public List<Lesson> getAllLessons() {
+    public List<Chapter> getAllLessons() {
 
-        return lessonList;
+        return chapterList;
     }
 
-    public Lesson getLessonById(String lessonId) {
+    public Chapter getLessonById(String lessonId) {
 
-        for (Lesson lesson : lessonList) {
+        for (Chapter chapter : chapterList) {
 
-            if (lesson.getLessonId().equals(lessonId)) {
+            if (chapter.getLessonId().equals(lessonId)) {
 
-                return lesson;
+                return chapter;
             }
         }
 
@@ -43,15 +43,15 @@ public class LessonDAO {
     }
 
     public void updateLesson(String lessonId,
-                             Lesson updatedLesson) {
+                             Chapter updatedChapter) {
 
-        Lesson lesson = getLessonById(lessonId);
+        Chapter chapter = getLessonById(lessonId);
 
-        if (lesson != null) {
+        if (chapter != null) {
 
-            lesson.setTitle(updatedLesson.getTitle());
-            lesson.setDescription(updatedLesson.getDescription());
-            lesson.setXpReward(updatedLesson.getXpReward());
+            chapter.setTitle(updatedChapter.getTitle());
+            chapter.setDescription(updatedChapter.getDescription());
+            chapter.setXpReward(updatedChapter.getXpReward());
 
             System.out.println("Lesson berhasil diupdate!");
 
@@ -63,25 +63,25 @@ public class LessonDAO {
 
     public void deleteLesson(String lessonId) {
 
-        lessonList.removeIf(
-                lesson ->
-                        lesson.getLessonId().equals(lessonId)
+        chapterList.removeIf(
+                chapter ->
+                        chapter.getLessonId().equals(lessonId)
         );
 
         System.out.println("Lesson berhasil dihapus!");
     }
 
-    public List<Lesson> searchLesson(String keyword) {
+    public List<Chapter> searchLesson(String keyword) {
 
-        List<Lesson> result = new ArrayList<>();
+        List<Chapter> result = new ArrayList<>();
 
-        for (Lesson lesson : lessonList) {
+        for (Chapter chapter : chapterList) {
 
-            if (lesson.getTitle()
+            if (chapter.getTitle()
                     .toLowerCase()
                     .contains(keyword.toLowerCase())) {
 
-                result.add(lesson);
+                result.add(chapter);
             }
         }
 
@@ -90,6 +90,14 @@ public class LessonDAO {
 
     public int getTotalLesson() {
 
-        return lessonList.size();
+        return chapterList.size();
+    }
+
+    public int getTotalLessons() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Lesson getLessonByNumber(int lessonNumber) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

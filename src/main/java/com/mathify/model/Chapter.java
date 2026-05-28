@@ -11,27 +11,27 @@ import java.util.List;
  *
  * @author Akari
  */
-public class Lesson {
+public class Chapter {
     private String lessonId;
     private String title;
     private String description;
     private int xpReward;
 
-    private List<Lesson> prerequisite;
+    private List<Chapter> prerequisite;
     private List<LearningModule> modules;
     private List<Quiz> quizzes;
 
-    public Lesson() {
+    public Chapter() {
 
         prerequisite = new ArrayList<>();
         modules = new ArrayList<>();
         quizzes = new ArrayList<>();
     }
 
-    public Lesson(String lessonId,
-                  String title,
-                  String description,
-                  int xpReward) {
+    public Chapter(String lessonId,
+                   String title,
+                   String description,
+                   int xpReward) {
 
         this.lessonId = lessonId;
         this.title = title;
@@ -53,9 +53,9 @@ public class Lesson {
         quizzes.add(quiz);
     }
 
-    public void addPrerequisite(Lesson lesson) {
+    public void addPrerequisite(Chapter chapter) {
 
-        prerequisite.add(lesson);
+        prerequisite.add(chapter);
     }
 
     public int getTotalModules() {
@@ -105,11 +105,11 @@ public class Lesson {
         this.xpReward = xpReward;
     }
 
-    public List<Lesson> getPrerequisite() {
+    public List<Chapter> getPrerequisite() {
         return prerequisite;
     }
 
-    public void setPrerequisite(List<Lesson> prerequisite) {
+    public void setPrerequisite(List<Chapter> prerequisite) {
         this.prerequisite = prerequisite;
     }
 

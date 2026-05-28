@@ -56,7 +56,7 @@ src/
         │       │           ├── hero.jsp
         │       │           ├── herodevice.jsp
         │       │           ├── skilltree.jsp
-        │       │           ├── lesson.jsp
+        │       │           ├── chapter.jsp
         │       │           ├── gamification.jsp
         │       │           ├── curriculum.jsp
         │       │           ├── testimonials.jsp

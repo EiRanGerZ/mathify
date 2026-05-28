@@ -2,10 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mathify.servlet;
+package com.mathify.controller;
 
 import com.mathify.dao.LessonDAO;
-import com.mathify.model.Lesson;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -50,30 +49,30 @@ public class LessonContentServlet
         }
 
         // Ambil lesson dari DAO
-        Lesson lesson =
-                dao.getLessonByNumber(
-                        lessonNumber
-                );
-
-        // Total lesson
-        int totalLessons =
-                dao.getTotalLessons();
+//        Lesson lesson =
+//                dao.getLessonByNumber(
+//                        lessonNumber
+//                );
+//
+//        // Total lesson
+//        int totalLessons =
+//                dao.getTotalLessons();
 
         // Kirim data ke JSP
-        request.setAttribute(
-                "lesson",
-                lesson
-        );
-
-        request.setAttribute(
-                "currentLesson",
-                lessonNumber
-        );
-
-        request.setAttribute(
-                "totalLessons",
-                totalLessons
-        );
+//        request.setAttribute(
+//                "lesson",
+//                lesson
+//        );
+//
+//        request.setAttribute(
+//                "currentLesson",
+//                lessonNumber
+//        );
+//
+//        request.setAttribute(
+//                "totalLessons",
+//                totalLessons
+//        );
 
         // Forward ke JSP
         request.getRequestDispatcher(

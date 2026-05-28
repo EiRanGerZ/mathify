@@ -6,7 +6,7 @@ A focused yet casual math learning platform with gamification elements. Mathify 
 
 - Structured math courses (Basic Math, Calculus, Linear Algebra, and more)
 - Gamified learning experience (XP, streaks, progression)
-- Course-based curriculum with formal lesson structure
+- Course-based curriculum with formal chapter structure
 - Web-based, accessible from any browser
 
 ## Tech Stack
@@ -95,7 +95,7 @@ src/
         │       │           ├── hero.jsp
         │       │           ├── herodevice.jsp
         │       │           ├── skilltree.jsp
-        │       │           ├── lesson.jsp
+        │       │           ├── chapter.jsp
         │       │           ├── gamification.jsp
         │       │           ├── curriculum.jsp
         │       │           ├── testimonials.jsp
