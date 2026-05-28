@@ -1,23 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mathify.model;
 
-/**
- *
- * @author ACER
- */
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Quiz {
 
-    private final String quizId;
-    private final String title;
-    private final int passingScore;
-    private final List<Question> questions;
+    private String quizId;
+    private String title;
+    private int passingScore;
+    private List<Question> questions;
 
     public Quiz(String quizId, String title, int passingScore, List<Question> questions) {
         if (quizId == null || quizId.isBlank()) {
@@ -39,6 +31,7 @@ public class Quiz {
         this.questions = Collections.unmodifiableList(new ArrayList<>(questions));
     }
 
+    // ── Getters ────────────────────────────────────────────────────────────────
     public String getQuizId() {
         return quizId;
     }
@@ -55,6 +48,34 @@ public class Quiz {
         return questions;
     }
 
+    // ── Setters ────────────────────────────────────────────────────────────────
+    public void setTitle(String title) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("title must not be blank");
+        }
+        this.title = title;
+    }
+
+    public void setPassingScore(int passingScore) {
+        if (passingScore < 0) {
+            throw new IllegalArgumentException("passingScore must be >= 0");
+        }
+        this.passingScore = passingScore;
+    }
+
+    /**
+     * Setter untuk questions menggunakan defensive copy — list yang disimpan
+     * tidak bisa dimodifikasi dari luar setelah di-set. Ini mencegah bug
+     * seperti list di-clear dari luar tanpa sepengetahuan Quiz.
+     */
+    public void setQuestions(List<Question> questions) {
+        if (questions == null || questions.isEmpty()) {
+            throw new IllegalArgumentException("questions must not be empty");
+        }
+        this.questions = Collections.unmodifiableList(new ArrayList<>(questions));
+    }
+
+    // ── Business methods ───────────────────────────────────────────────────────
     public int totalPoints() {
         int total = 0;
         for (Question q : questions) {
