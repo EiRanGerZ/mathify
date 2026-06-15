@@ -176,10 +176,6 @@ src/
 
 ## Conventions
 
-- **No inline `<script>` or `<style>` blocks in JSPs.** Extract JS to
-  `assets/js/…` and CSS to `assets/css/…`. The one exception is
-  `<script type="application/json">` blocks used to ship server-rendered
-  data to the client (see `skilltree.jsp` for an example).
 - **Tailwind utilities first, inline `style=""` for one-offs.** Use
   `bg-paper` instead of `style="background: var(--paper);"`. The custom
   palette is in `tailwind.config.js` so all design tokens are usable as
@@ -202,6 +198,140 @@ src/
 | `DB_NAME` | Database name | `mathify` |
 | `DB_USER` | Database user | `mathify_user` |
 | `DB_PASSWORD` | Database password | *(set in compose.yaml)* |
+
+---
+
+## Firebase Authentication Setup
+
+Mathify uses **Firebase Authentication** for login, registration, and Google OAuth. The Java backend verifies Firebase ID tokens using the Admin SDK; the browser never sends passwords to our server.
+
+### How the auth flow works
+
+```
+Browser (React)                 Tomcat Servlet            Firebase Cloud
+───────────────                 ──────────────            ──────────────
+  Email + password
+        │
+  firebase.auth()
+  .signInWithEmailAndPassword()  ─────────────────────────► Firebase Auth
+                                 ◄─────────────────────── JWT ID token
+        │
+  getIdToken()
+        │
+  POST /login { idToken }  ──►  LoginServlet.doPost()
+                                FirebaseAuth.verifyIdToken() ─► Firebase
+                                                          ◄── decoded claims
+                                session.setAttribute(
+                                  "authUser", new AuthUser(...))
+                           ◄──  redirect /dashboard
+```
+
+### Step 1 — Create a Firebase project
+
+1. Go to [console.firebase.google.com](https://console.firebase.google.com) → **Add project**
+2. **Build → Authentication → Get started**
+3. Enable these sign-in methods:
+   - **Email/Password** — toggle on
+   - **Google** — toggle on, select your support email
+
+### Step 2 — Get your web app config (public values)
+
+1. **Project Settings** (gear icon) → **Your apps** → **Add app** → Web (`</>`)
+2. Register the app (name it anything, no hosting needed)
+3. Copy the `firebaseConfig` object — you'll need these values:
+
+```javascript
+const firebaseConfig = {
+  apiKey:            "AIzaSy...",
+  authDomain:        "your-project.firebaseapp.com",
+  projectId:         "your-project-id",
+  storageBucket:     "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId:             "1:123456789:web:abc123"
+};
+```
+
+### Step 3 — Download the service account key (private)
+
+1. **Project Settings → Service accounts** tab
+2. Click **Generate new private key** → **Generate key**
+3. Save the downloaded JSON as **`firebase/serviceAccountKey.json`** in the project root
+
+> ⚠️ `firebase/` is in `.gitignore`. Never commit this file.
+
+### Step 4 — Set environment variables
+
+**For Docker (`compose.yaml` already configured):**
+
+Fill in the blank values in `compose.yaml`:
+
+```yaml
+environment:
+  - FIREBASE_API_KEY=AIzaSy...
+  - FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+  - FIREBASE_PROJECT_ID=your-project-id
+  - FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+  - FIREBASE_MESSAGING_SENDER_ID=123456789
+  - FIREBASE_APP_ID=1:123456789:web:abc123
+```
+
+The service account key is mounted automatically as a Docker secret from `firebase/serviceAccountKey.json`.
+
+**For local dev (outside Docker):**
+
+Set one additional env var pointing to the key file:
+
+```bash
+# Linux / macOS
+export FIREBASE_CREDENTIALS_FILE=/path/to/mathify/firebase/serviceAccountKey.json
+
+# Windows (PowerShell)
+$env:FIREBASE_CREDENTIALS_FILE = "C:\path\to\mathify\firebase\serviceAccountKey.json"
+```
+
+Then set the six public config vars in your shell or a `.env.local` file (not committed).
+
+### Step 5 — Add authorized domains (for Google OAuth)
+
+In **Firebase Console → Authentication → Settings → Authorized domains**, add:
+
+- `localhost` (already there by default)
+- Your production domain when you deploy
+
+### What gets stored in session
+
+After a successful login or registration the servlet stores an `AuthUser` record in the HTTP session:
+
+| Field | Value | Used for |
+|---|---|---|
+| `uid` | Firebase UID (e.g. `dK3mXp...`) | Foreign key in all DB tables |
+| `email` | Verified email address | Display, notifications |
+| `displayName` | Name from registration or Google profile | Nav avatar, greeting |
+
+Access it in any servlet or JSP:
+
+```java
+AuthUser authUser = (AuthUser) session.getAttribute("authUser");
+if (authUser == null) {
+    resp.sendRedirect(req.getContextPath() + "/login");
+    return;
+}
+```
+
+### Environment variable reference
+
+| Variable | Where used | Visibility |
+|---|---|---|
+| `FIREBASE_API_KEY` | JSP → browser JS | **Public** (safe to commit once filled) |
+| `FIREBASE_AUTH_DOMAIN` | JSP → browser JS | Public |
+| `FIREBASE_PROJECT_ID` | JSP → browser JS | Public |
+| `FIREBASE_STORAGE_BUCKET` | JSP → browser JS | Public |
+| `FIREBASE_MESSAGING_SENDER_ID` | JSP → browser JS | Public |
+| `FIREBASE_APP_ID` | JSP → browser JS | Public |
+| `firebase/serviceAccountKey.json` | Docker secret → Java Admin SDK | **Private — never commit** |
+| `FIREBASE_CREDENTIALS_FILE` | Local dev fallback path | Private |
+
+---
 
 ## Team
 

@@ -1,6 +1,0 @@
-DB_HOST=db-host
-DB_PORT=1234
-DB_NAME=db-name
-DB_USER=db-user
-DB_PASSWORD_FILE=path/to/your-password.txt
-DB_PASSWORD=super-secret-password

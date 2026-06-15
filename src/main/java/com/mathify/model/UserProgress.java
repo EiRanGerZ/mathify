@@ -15,7 +15,6 @@ public class UserProgress {
     private final Map<String, ChapterProgress> chapterProgress;
     private final Map<String, List<QuizAttempt>> quizAttempts;
 
-    //Constructor
     public UserProgress(String studentId) {
         this.studentId         = studentId;
         this.totalXP           = 0;
@@ -25,6 +24,14 @@ public class UserProgress {
         this.courseEnrollments = new LinkedHashMap<>();
         this.chapterProgress   = new LinkedHashMap<>();
         this.quizAttempts      = new LinkedHashMap<>();
+    }
+
+    /** Convenience constructor for loading persisted values from the database. */
+    public UserProgress(String studentId, int totalXP, int level, int currentStreak) {
+        this(studentId);
+        this.totalXP       = totalXP;
+        this.level         = level;
+        this.currentStreak = currentStreak;
     }
 
     //Getter

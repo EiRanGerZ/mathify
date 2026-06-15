@@ -34,7 +34,7 @@ src/
 └── main/
     ├── java/
     │   └── com/mathify/
-    │       ├── servlet/         # HttpServlet subclasses (controllers)
+    │       ├── controller/      # HttpServlet subclasses (controllers)
     │       ├── model/           # Plain Java objects (data models)
     │       ├── dao/             # Data Access Objects (DB queries)
     │       ├── service/         # Business logic layer

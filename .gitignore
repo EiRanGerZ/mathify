@@ -31,7 +31,6 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-.nbactions.xml
 
 ### VS Code ###
 .vscode/
@@ -41,4 +40,7 @@ build/
 
 # Secrets
 db/password.txt
+firebase/
 .env*
+!.env.example
+/nbactions.xml

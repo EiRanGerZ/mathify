@@ -12,7 +12,7 @@ import java.util.List;
  * @author Akari
  */
 public class Chapter {
-    private String lessonId;
+    private String chapterId;
     private String title;
     private String description;
     private int xpReward;
@@ -33,7 +33,7 @@ public class Chapter {
                    String description,
                    int xpReward) {
 
-        this.lessonId = lessonId;
+        this.chapterId = lessonId;
         this.title = title;
         this.description = description;
         this.xpReward = xpReward;
@@ -74,11 +74,11 @@ public class Chapter {
     }
 
     public String getLessonId() {
-        return lessonId;
+        return chapterId;
     }
 
     public void setLessonId(String lessonId) {
-        this.lessonId = lessonId;
+        this.chapterId = lessonId;
     }
 
     public String getTitle() {

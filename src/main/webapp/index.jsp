@@ -129,33 +129,25 @@
           position: 'sticky', top: 0, zIndex: 50,
           padding: scrolled ? '14px 0' : '22px 0',
           transition: 'padding .2s ease',
-        }}>
+        }} className="bg-[#fbf9f4]">
           <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: scrolled ? '8px 14px 8px 12px' : '0',
-              background: scrolled ? 'rgba(251,253,247,0.9)' : 'transparent',
-              backdropFilter: scrolled ? 'blur(10px)' : 'none',
-              border: scrolled ? '1px solid var(--line)' : '1px solid transparent',
-              borderRadius: 999, transition: 'all .2s ease',
-            }}>
-              <Logo />
-              <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.01em' }}>Mathlify</span>
-            </div>
-
-            <nav style={{
-              display: 'flex', alignItems: 'center', gap: 4, padding: '6px',
-              background: 'rgba(255,253,247,0.7)', backdropFilter: 'blur(10px)',
-              border: '1px solid var(--line)', borderRadius: 999,
-            }}>
-              {['Curriculum', 'For learners', 'For schools', 'Pricing'].map(l => (
-                <a key={l} href="#" style={{ padding: '8px 14px', borderRadius: 999, fontSize: 14, fontWeight: 500, color: 'var(--ink-2)' }}>{l}</a>
-              ))}
-            </nav>
+            <a href="/">
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: scrolled ? '8px 14px 8px 12px' : '0',
+                  background: scrolled ? 'rgba(251,253,247,0.9)' : 'transparent',
+                  backdropFilter: scrolled ? 'blur(10px)' : 'none',
+                  border: scrolled ? '1px solid var(--line)' : '1px solid transparent',
+                  borderRadius: 999, transition: 'all .2s ease',
+                }}>
+                  <Logo />
+                  <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.01em' }}>Mathlify</span>
+                </div>
+            </a>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <a href="#" style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>Sign in</a>
-              <a href="#" style={{
+              <a href="/register" style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>Sign in</a>
+              <a href="/login" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '10px 16px', borderRadius: 999,
                 background: 'var(--ink)', color: 'var(--paper)',
@@ -427,7 +419,7 @@
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 18 }}>
-            <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 24px', borderRadius: 14, background: 'var(--green)', color: 'white', fontSize: 16, fontWeight: 700, boxShadow: '0 2px 0 var(--green-deep), 0 12px 24px -8px rgba(31,138,91,0.5)' }}>
+            <a href="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 24px', borderRadius: 14, background: 'var(--green)', color: 'white', fontSize: 16, fontWeight: 700, boxShadow: '0 2px 0 var(--green-deep), 0 12px 24px -8px rgba(31,138,91,0.5)' }}>
               Start learning free <Icon.Arrow />
             </a>
             <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '16px 22px', borderRadius: 14, background: 'var(--paper)', color: 'var(--ink)', border: '1px solid var(--line)', fontSize: 16, fontWeight: 600 }}>
@@ -742,8 +734,8 @@
     };
 
     /* ── Gamification ───────────────────────────────────────────────── */
-    const Cell = ({ span, rows=1, dark, children, style: s }) => (
-      <div style={{ gridColumn:`span ${span}`, gridRow:`span ${rows}`, borderRadius:24, padding:28, background:dark?'var(--ink)':'var(--paper)', color:dark?'var(--paper)':'var(--ink)', border:dark?'none':'1px solid var(--line)', boxShadow:'var(--shadow-sm)', display:'flex', flexDirection:'column', position:'relative', overflow:'hidden', ...s }}>{children}</div>
+    const Cell = ({ rows=1, dark, children, style: s, className: cls }) => (
+      <div className={cls} style={{ gridRow:`span ${rows}`, borderRadius:24, padding:28, background:dark?'var(--ink)':'var(--paper)', color:dark?'var(--paper)':'var(--ink)', border:dark?'none':'1px solid var(--line)', boxShadow:'var(--shadow-sm)', display:'flex', flexDirection:'column', position:'relative', overflow:'hidden', ...s }}>{children}</div>
     );
 
     const CellLabel = ({ children, color }) => (
@@ -751,7 +743,7 @@
     );
 
     const StreakCard = () => (
-      <Cell span={5}>
+      <Cell className="col-span-1 sm:col-span-6 lg:col-span-5">
         <CellLabel color="var(--amber-soft)"><Icon.Flame style={{ color:'var(--amber-deep)' }}/> STREAK</CellLabel>
         <h3 style={{ margin:0, fontSize:28, fontWeight:700, letterSpacing:'-0.02em' }}>47 days of doing math.</h3>
         <p style={{ margin:'8px 0 16px', fontSize:14, color:'var(--ink-2)', lineHeight:1.5 }}>A small flame for each day you finish a lesson. Miss a day and you can spend a Freeze. Miss two and we'll be honest with you.</p>
@@ -775,7 +767,7 @@
     );
 
     const XPLevelCard = () => (
-      <Cell span={4} dark>
+      <Cell className="col-span-1 sm:col-span-3 lg:col-span-4" dark>
         <CellLabel color="rgba(255,255,255,0.1)"><Icon.Bolt style={{ color:'var(--amber)' }}/> <span style={{ color:'var(--paper)' }}>XP & LEVEL</span></CellLabel>
         <div style={{ display:'flex', alignItems:'baseline', gap:8, marginBottom:6 }}>
           <span style={{ fontSize:52, fontWeight:800, letterSpacing:'-0.04em', lineHeight:1 }}>14</span>
@@ -795,7 +787,7 @@
     );
 
     const HeartsCard = () => (
-      <Cell span={3}>
+      <Cell className="col-span-1 sm:col-span-3 lg:col-span-3">
         <CellLabel color="var(--bg-2)"><Icon.Heart style={{ color:'#E04A4A' }}/> HEARTS</CellLabel>
         <div style={{ display:'flex', gap:6, marginBottom:14 }}>
           {[1,2,3,4,5].map(i => <span key={i} style={{ color: i<=4?'#E04A4A':'var(--bg-2)', fontSize:22 }}><Icon.Heart style={{ width:22, height:22 }}/></span>)}
@@ -806,7 +798,7 @@
     );
 
     const QuestsCard = () => (
-      <Cell span={5}>
+      <Cell className="col-span-1 sm:col-span-6 lg:col-span-5">
         <CellLabel color="var(--blue-soft)"><Icon.Target style={{ color:'var(--blue-deep)' }}/> DAILY QUESTS</CellLabel>
         <h3 style={{ margin:'0 0 16px', fontSize:22, fontWeight:700, letterSpacing:'-0.02em' }}>Three small wins, every day.</h3>
         {[
@@ -838,7 +830,7 @@
         { c:'var(--ink-3)', l:'???',          earned:false },
       ];
       return (
-        <Cell span={4}>
+        <Cell className="col-span-1 sm:col-span-3 lg:col-span-4">
           <CellLabel color="var(--amber-soft)"><Icon.Trophy style={{ color:'var(--amber-deep)' }}/> ACHIEVEMENTS</CellLabel>
           <h3 style={{ margin:'0 0 16px', fontSize:22, fontWeight:700, letterSpacing:'-0.02em' }}>72 to collect.</h3>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10, flex:1 }}>
@@ -861,7 +853,7 @@
         { rank:4, name:'Priya R.',  xp:3580, you:false, c:'var(--plum)'  },
       ];
       return (
-        <Cell span={5}>
+        <Cell className="col-span-1 sm:col-span-3 lg:col-span-3">
           <CellLabel color="var(--green-soft)"><Icon.Compass style={{ color:'var(--green-deep)' }}/> WEEKLY LEAGUE</CellLabel>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:14 }}>
             <h3 style={{ margin:0, fontSize:22, fontWeight:700, letterSpacing:'-0.02em' }}>Emerald League · Week 3</h3>
@@ -887,7 +879,7 @@
             title={<>The reward loop that makes math <span className="serif" style={{ color:'var(--amber-deep)', fontWeight:500 }}>actually stick.</span></>}
             subtitle="XP, streaks, hearts and achievements aren't sprinkles — they're a deliberate system that turns 12 minutes a day into compound progress."
           />
-          <div style={{ marginTop:64, display:'grid', gridTemplateColumns:'repeat(12,1fr)', gridAutoRows:'minmax(180px,auto)', gap:14 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-6 lg:grid-cols-12 gap-[14px]" style={{ marginTop:64, gridAutoRows:'minmax(180px,auto)' }}>
             <StreakCard/>
             <XPLevelCard/>
             <HeartsCard/>
