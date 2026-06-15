@@ -23,7 +23,7 @@ import java.io.IOException;
  * Unauthenticated requests are redirected to {@code /login}. Public routes (landing,
  * login, register, logout, library, assets) are simply not mapped here.
  */
-@WebFilter(urlPatterns = {"/admin/*", "/dashboard", "/course", "/quiz", "/checkout", "/payment/*"})
+@WebFilter(urlPatterns = {"/admin/*", "/dashboard", "/course", "/quiz", "/checkout", "/payment/*", "/premium"})
 public class AuthFilter implements Filter {
 
     @Override

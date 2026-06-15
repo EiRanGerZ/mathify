@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 @WebServlet("/course/enroll")
@@ -47,13 +49,22 @@ public class CourseEnrollServlet extends HttpServlet {
             // Enroll in DB
             new CourseEnrollmentDAO().enroll(authUser.uid(), courseId);
 
-            // Update session progress object if present
+            // Keep the in-session progress object in sync so other pages
+            // (dashboard, library) reflect the new enrollment without a re-login.
             UserProgress progress = (UserProgress) session.getAttribute("progress");
             if (progress != null) {
                 progress.enrollCourse(courseId);
             }
 
-            resp.sendRedirect(req.getContextPath() + "/course?courseId=" + courseId);
+            // Browse-and-enroll flows pass ?redirect=/courses to stay on the
+            // catalog with a toast; otherwise drop the student into the course.
+            String redirect = req.getParameter("redirect");
+            if (redirect != null && redirect.startsWith("/") && !redirect.startsWith("//")) {
+                String msg = URLEncoder.encode("Enrolled successfully!", StandardCharsets.UTF_8);
+                resp.sendRedirect(req.getContextPath() + redirect + "?msg=" + msg);
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/course?courseId=" + courseId);
+            }
         } catch (SQLException e) {
             throw new ServletException("Failed to enroll in course", e);
         }

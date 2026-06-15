@@ -39,7 +39,7 @@ build/
 .DS_Store
 
 # Secrets
-db/password.txt
+db/
 firebase/
 .env*
 !.env.example

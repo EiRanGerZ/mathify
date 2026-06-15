@@ -92,30 +92,21 @@
     </div>
   <% } %>
 
-  <div style="max-width:1280px;margin:12px auto 0;padding:0 16px;">
-    <% if (premium) { %>
-      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--amber-soft);color:var(--amber-deep);font-weight:700;font-size:13px;">
-        ★ Premium · <%= premPlan %><% if (premExpiry != null) { %> · until <%= premExpiry %><% } %>
-      </div>
-    <% } else { %>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
-        <span style="color:var(--ink-3);font-size:13px;font-weight:600;">Unlock everything with Premium —</span>
-        <a href="<%= ctx %>/checkout?plan=MONTHLY" style="padding:7px 14px;border-radius:999px;background:var(--ink);color:var(--paper);font-weight:700;font-size:13px;">Monthly · Rp 150.000</a>
-        <a href="<%= ctx %>/checkout?plan=ANNUAL" style="padding:7px 14px;border-radius:999px;background:var(--amber);color:#fff;font-weight:700;font-size:13px;">Annual · Rp 1.500.000</a>
-      </div>
-    <% } %>
-  </div>
+  <%-- Premium upgrade prompt removed from the dashboard — plan management now lives
+       in the profile dropdown (Update plan → /premium). --%>
 
   <div id="root"></div>
 
   <script>
     var STUDENT_CONTEXT = {
-      name:    "<%= jsName %>",
-      initial: "<%= initial %>",
-      streak:  <%= streak %>,
-      xp:      <%= totalXP %>,
-      level:   <%= level %>,
-      ctx:     "<%= ctx %>"
+      name:        "<%= jsName %>",
+      initial:     "<%= initial %>",
+      streak:      <%= streak %>,
+      xp:          <%= totalXP %>,
+      level:       <%= level %>,
+      ctx:         "<%= ctx %>",
+      premium:     <%= premium %>,
+      premiumPlan: "<%= premPlan != null ? premPlan : "" %>"
     };
   </script>
 
@@ -147,6 +138,7 @@
       Clock:   (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7 4V7L9 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       Tree:    (p) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...p}><path d="M8 2V14M8 6L11 4M8 6L5 4M8 10L11.5 8M8 10L4.5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       Book:    (p) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...p}><path d="M3 3H7C7.5 3 8 3.5 8 4V13C8 12.5 7.5 12 7 12H3V3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M13 3H9C8.5 3 8 3.5 8 4V13C8 12.5 8.5 12 9 12H13V3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+      Grid:    (p) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...p}><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.5"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.5"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.5"/><rect x="9" y="9" width="4.5" height="4.5" rx="1.2" stroke="currentColor" strokeWidth="1.5"/></svg>,
       Plus:    (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="M7 3V11M3 7H11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
       Menu:    (p) => <svg width="18" height="18" viewBox="0 0 18 18" fill="none" {...p}><path d="M3 5H15M3 9H15M3 13H15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
       Close:   (p) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...p}><path d="M4 4L12 12M12 4L4 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>,
@@ -193,7 +185,7 @@
       ];
       const menuItems = [
         { icon: <Icon.Star/>,    label: 'My Profile',     href: '#' },
-        { icon: <Icon.Sparkle/>, label: 'Preferences',    href: '#' },
+        { icon: <Icon.Sparkle/>, label: 'Update plan',    href: base + '/premium' },
         { icon: <Icon.Book/>,    label: 'Help & Support', href: '#' },
       ];
 
@@ -202,9 +194,15 @@
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 16px 14px' }}>
             <Avatar letter={SC.initial || 'S'} color="var(--green)" size={40}/>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em' }}>{SC.name || 'Student'}</div>
-              <span className="mono" style={{ fontSize: 11, padding: '2px 7px', borderRadius: 6, background: 'var(--green-soft)', color: 'var(--green-deep)', fontWeight: 700 }}>L{SC.level || 1}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, flexWrap: 'wrap' }}>
+                <span className="mono" style={{ fontSize: 11, padding: '2px 7px', borderRadius: 6, background: 'var(--green-soft)', color: 'var(--green-deep)', fontWeight: 700 }}>L{SC.level || 1}</span>
+                {SC.premium
+                  ? <span style={{ fontSize: 11, padding: '2px 7px', borderRadius: 6, background: 'var(--amber-soft)', color: 'var(--amber-deep)', fontWeight: 700 }}>★ {SC.premiumPlan}</span>
+                  : <span style={{ fontSize: 11, padding: '2px 7px', borderRadius: 6, background: 'var(--bg-2)', color: 'var(--ink-3)', fontWeight: 700 }}>Free</span>
+                }
+              </div>
             </div>
           </div>
           {/* Stats */}
@@ -251,10 +249,9 @@
       const [open, setOpen] = React.useState(false);
       const [profileOpen, setProfileOpen] = React.useState(false);
       const items = [
-        { label: 'Today',      icon: <Icon.Compass/>, href: base + '/dashboard', active: true },
-        { label: 'Skill tree', icon: <Icon.Tree/>,    href: '#' },
-        { label: 'Practice',   icon: <Icon.Target/>,  href: '#', onClick: () => notify('Practice module coming soon') },
-        { label: 'Library',    icon: <Icon.Book/>,    href: base + '/library' },
+        { label: 'Today',       icon: <Icon.Compass/>, href: base + '/dashboard', active: true },
+        { label: 'My Library',  icon: <Icon.Book/>,    href: base + '/library' },
+        { label: 'All Courses', icon: <Icon.Grid/>,    href: base + '/courses' },
       ];
       return (
         <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(251,248,241,0.85)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderBottom: '1px solid var(--line)' }}>

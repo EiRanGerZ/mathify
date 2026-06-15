@@ -74,6 +74,21 @@ public class CourseDAO {
         }
     }
 
+    public void update(String courseId, String title, String description, String category) throws SQLException {
+        String sql = """
+                UPDATE courses
+                   SET title = ?,
+                       description = ?,
+                       track = COALESCE(?, track)
+                 WHERE course_id = ?
+                """;
+        QueryHelper.executeUpdate(sql, title, description, category, courseId);
+    }
+
+    public void delete(String courseId) throws SQLException {
+        QueryHelper.executeUpdate("DELETE FROM courses WHERE course_id = ?", courseId);
+    }
+
     public void addPrerequisite(String courseId, String prerequisiteId) throws SQLException {
         String sql = """
                 INSERT INTO course_prerequisites (course_id, prerequisite_id)

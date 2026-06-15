@@ -1,9 +1,11 @@
 package com.mathify.controller;
 
 import com.mathify.dao.CourseDAO;
+import com.mathify.dao.CourseEnrollmentDAO;
+import com.mathify.model.AuthUser;
 import com.mathify.model.CourseCardView;
-import com.mathify.model.User;
-import com.mathify.model.UserProgress;
+import com.mathify.model.CourseEnrollment;
+import com.mathify.util.CourseCardJson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -15,68 +17,68 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * "My Library" ({@code /library}): the courses a student is currently enrolled
+ * in, split into In Progress / Completed, plus their current focus (the last
+ * course they touched). Browsing and enrolling in new courses lives on the
+ * separate catalog page, {@link AllCoursesServlet} ({@code /courses}).
+ */
 @WebServlet("/library")
 public class CourseLibraryServlet extends HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(CourseLibraryServlet.class);
+
+    private final CourseDAO courseDAO = new CourseDAO();
+    private final CourseEnrollmentDAO enrollmentDAO = new CourseEnrollmentDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         HttpSession session = req.getSession(false);
-//        if (session == null || session.getAttribute("authUser") == null) {
-//            resp.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
+        AuthUser authUser = (session != null) ? (AuthUser) session.getAttribute("authUser") : null;
 
-        User user         = (session != null) ? (User) session.getAttribute("user") : null;
-        UserProgress prog = (session != null) ? (UserProgress) session.getAttribute("progress") : null;
+        List<CourseCardView> enrolledCourses = new ArrayList<>();
+        Set<String> enrolledIds  = new HashSet<>();
+        Set<String> completedIds = new HashSet<>();
+        String focusCourseJson   = "null";
 
-        List<CourseCardView> courses;
         try {
-            courses = new CourseDAO().findAll();
+            if (authUser != null) {
+                List<CourseEnrollment> enrollments = enrollmentDAO.findByUser(authUser.uid());
+                for (CourseEnrollment e : enrollments) {
+                    enrolledIds.add(e.courseId());
+                    if (e.isCompleted()) completedIds.add(e.courseId());
+                }
+
+                // Only the enrolled courses are shown here — filter the catalog down.
+                for (CourseCardView c : courseDAO.findAll()) {
+                    if (enrolledIds.contains(c.getId())) {
+                        enrolledCourses.add(c);
+                    }
+                }
+
+                String lastId = enrollmentDAO.findLastAccessedCourseId(authUser.uid());
+                if (lastId != null) {
+                    CourseCardView focus = courseDAO.findById(lastId);
+                    if (focus != null) {
+                        focusCourseJson = CourseCardJson.one(focus);
+                    }
+                }
+            }
         } catch (SQLException e) {
-            log.error("Failed to load courses from DB", e);
-            courses = List.of();
+            log.error("Failed to load library data", e);
         }
 
-        req.setAttribute("user", user);
-        req.setAttribute("progress", prog);
-        req.setAttribute("coursesJson", toJson(courses));
+        req.setAttribute("coursesJson",      CourseCardJson.array(enrolledCourses));
+        req.setAttribute("enrolledIdsJson",  CourseCardJson.ids(enrolledIds));
+        req.setAttribute("completedIdsJson", CourseCardJson.ids(completedIds));
+        req.setAttribute("focusCourseJson",  focusCourseJson);
         req.getRequestDispatcher("/WEB-INF/jsp/pages/library/index.jsp").forward(req, resp);
-    }
-
-    private String toJson(List<CourseCardView> courses) {
-        StringBuilder sb = new StringBuilder("[");
-        for (int i = 0; i < courses.size(); i++) {
-            if (i > 0) sb.append(",");
-            CourseCardView c = courses.get(i);
-            sb.append("{")
-              .append("\"id\":\"").append(esc(c.getId())).append("\",")
-              .append("\"title\":\"").append(esc(c.getTitle())).append("\",")
-              .append("\"blurb\":\"").append(esc(c.getDescription())).append("\",")
-              .append("\"track\":\"").append(esc(c.getTrack())).append("\",")
-              .append("\"level\":").append(c.getLevelNum()).append(",")
-              .append("\"color\":\"").append(esc(c.getColor())).append("\",")
-              .append("\"glyph\":\"").append(esc(c.getGlyph())).append("\",")
-              .append("\"lessons\":").append(c.getTotalLessons()).append(",")
-              .append("\"hours\":\"").append(esc(c.getEstimatedHours())).append("\",")
-              .append("\"xp\":").append(c.getXpReward()).append(",")
-              .append("\"status\":\"").append(esc(c.getStatus())).append("\",")
-              .append("\"progress\":0")
-              .append("}");
-        }
-        return sb.append("]").toString();
-    }
-
-    private String esc(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "");
     }
 }

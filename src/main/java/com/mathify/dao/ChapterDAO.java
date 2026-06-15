@@ -87,6 +87,17 @@ public class ChapterDAO {
         return chapters;
     }
 
+    public void update(String chapterId, String title, String description, int xpReward) throws SQLException {
+        String sql = """
+                UPDATE chapters
+                   SET title = ?,
+                       description = ?,
+                       xp_reward = ?
+                 WHERE chapter_id = ?
+                """;
+        QueryHelper.executeUpdate(sql, title, description, xpReward, chapterId);
+    }
+
     public void delete(String chapterId) throws SQLException {
         // modules, quizzes, and prerequisite links cascade via FK ON DELETE CASCADE.
         QueryHelper.executeUpdate("DELETE FROM chapters WHERE chapter_id = ?", chapterId);

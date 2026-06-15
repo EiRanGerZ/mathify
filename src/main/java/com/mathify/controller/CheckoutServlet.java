@@ -24,12 +24,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Builds a Midtrans Snap checkout for a premium upgrade.
+ * Starts a Midtrans Snap checkout for a premium upgrade and redirects the browser
+ * straight to the Midtrans-hosted payment page — there is no intermediate checkout
+ * page of our own.
  *
  * <p>Access requires a student session (enforced by {@code AuthFilter}). The order
- * is tied to the logged-in uid and the chosen {@link Plan} (?plan=MONTHLY|ANNUAL),
- * persisted as a PENDING {@link Payment}, and a Snap token is generated for the
- * page. Premium is <strong>not</strong> granted here — that only happens after
+ * is tied to the logged-in uid and the chosen {@link Plan} (?plan=MONTHLY|ANNUAL)
+ * and persisted as a PENDING {@link Payment}. A Snap transaction is created with a
+ * {@code callbacks.finish} URL pointing back at {@code /payment/confirm}; premium is
+ * <strong>not</strong> granted here — that only happens after
  * {@code PaymentConfirmServlet} verifies the transaction with Midtrans on return.
  */
 @WebServlet("/checkout")
@@ -72,29 +75,38 @@ public class CheckoutServlet extends HttpServlet {
             customerDetails.put("first_name", authUser.preferredName());
             customerDetails.put("email", authUser.email());
 
+            // After the hosted payment resolves, Midtrans redirects the browser back
+            // here (with ?order_id=…) so we can verify server-side and grant premium.
+            Map<String, Object> callbacks = new HashMap<>();
+            callbacks.put("finish", absoluteUrl(request, "/payment/confirm"));
+
             Map<String, Object> params = new HashMap<>();
             params.put("transaction_details", transactionDetails);
             params.put("item_details", List.of(itemDetails));
             params.put("customer_details", customerDetails);
+            params.put("callbacks", callbacks);
 
-            String snapToken = MidtransService.snapApi().createTransactionToken(params);
-
-            request.setAttribute("snapToken", snapToken);
-            request.setAttribute("clientKey", MidtransService.clientKey());
-            request.setAttribute("isProduction", MidtransService.isProduction());
-            request.setAttribute("orderId", orderId);
-            request.setAttribute("planName", plan.name());
-            request.setAttribute("grossAmount", grossAmount);
+            // Snap "redirect" mode: hand back the URL of the Midtrans-hosted page and
+            // bounce the user straight to it (sandbox vs production is driven by the
+            // configured environment in MidtransService).
+            String redirectUrl = MidtransService.snapApi().createTransactionRedirectUrl(params);
+            response.sendRedirect(redirectUrl);
 
         } catch (SQLException e) {
-            log.error("Failed to persist payment for uid={} order={}", authUser != null ? authUser.uid() : "null", orderId, e);
-            request.setAttribute("error", "Could not start checkout: " + e.getMessage());
+            log.error("Failed to persist payment for uid={} order={}", authUser.uid(), orderId, e);
+            response.sendRedirect(request.getContextPath() + "/premium?error=checkout");
         } catch (Exception e) {
-            log.error("Midtrans token creation failed for order={}", orderId, e);
-            request.setAttribute("error", "Payment service error: " + e.getMessage());
+            log.error("Midtrans checkout creation failed for order={}", orderId, e);
+            response.sendRedirect(request.getContextPath() + "/premium?error=payment");
         }
+    }
 
-        request.getRequestDispatcher("/WEB-INF/jsp/pages/checkout/index.jsp")
-                .forward(request, response);
+    /** Builds an absolute URL (scheme://host[:port]/context + path) for Midtrans callbacks. */
+    private String absoluteUrl(HttpServletRequest req, String path) {
+        String scheme = req.getScheme();
+        int port = req.getServerPort();
+        boolean defaultPort = ("http".equals(scheme) && port == 80) || ("https".equals(scheme) && port == 443);
+        String host = req.getServerName() + (defaultPort ? "" : ":" + port);
+        return scheme + "://" + host + req.getContextPath() + path;
     }
 }

@@ -9,7 +9,7 @@ import com.mathify.model.FillBlankQuestion;
 import com.mathify.model.DragDropQuestion;
 import com.mathify.model.DragItem;
 import com.mathify.model.DropZone;
-import com.mathify.model.User;
+import com.mathify.model.AuthUser;
 import com.mathify.model.UserProgress;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,7 +34,7 @@ public class QuizServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = req.getSession(false);
 
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        AuthUser authUser = (session != null) ? (AuthUser) session.getAttribute("authUser") : null;
         UserProgress prog = (session != null) ? (UserProgress) session.getAttribute("progress") : null;
 
         String quizId = req.getParameter("quizId");
@@ -56,7 +56,7 @@ public class QuizServlet extends HttpServlet {
             log.error("Failed to load quiz from DB", e);
         }
 
-        req.setAttribute("user", user);
+        req.setAttribute("authUser", authUser);
         req.setAttribute("progress", prog);
 
         if (quiz != null) {

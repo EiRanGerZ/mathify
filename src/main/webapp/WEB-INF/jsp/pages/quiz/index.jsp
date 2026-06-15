@@ -1,13 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
-<%@ page import="com.mathify.model.User, com.mathify.model.UserProgress" %>
+<%@ page import="com.mathify.model.AuthUser, com.mathify.model.UserProgress" %>
 <%
     HttpSession sess = request.getSession(false);
-    User user = (sess != null) ? (User) sess.getAttribute("user") : null;
+    AuthUser authUser = (sess != null) ? (AuthUser) sess.getAttribute("authUser") : null;
     UserProgress up = (sess != null) ? (UserProgress) sess.getAttribute("progress") : null;
-    String userName = (user != null && user.getName() != null) ? user.getName() : "Student";
+    String userName = (authUser != null) ? authUser.preferredName() : "Student";
     int streak = (up != null) ? up.getCurrentStreak() : 0;
     int totalXP = (up != null) ? up.getTotalXP() : 0;
-    String initial = String.valueOf(userName.charAt(0)).toUpperCase();
+    String initial = (authUser != null) ? authUser.initial() : "S";
     String jsName = userName.replace("\\","\\\\").replace("\"","\\\"");
     String ctx = request.getContextPath();
 %>
