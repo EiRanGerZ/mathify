@@ -1,6 +1,6 @@
 package com.mathify.dao;
 
-import com.mathify.model.Course;
+import com.mathify.model.CourseCardView;
 import com.mathify.util.DBConnection;
 
 import java.sql.Connection;
@@ -10,11 +10,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Loads course summary cards ({@link CourseCardView}) from the {@code courses} table. */
 public class CourseDAO {
 
-    public List<Course> findAll() throws SQLException {
+    public List<CourseCardView> findAll() throws SQLException {
         String sql = "SELECT * FROM courses ORDER BY level_num, id";
-        List<Course> list = new ArrayList<>();
+        List<CourseCardView> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -25,7 +26,7 @@ public class CourseDAO {
         return list;
     }
 
-    public Course findById(int id) throws SQLException {
+    public CourseCardView findById(int id) throws SQLException {
         String sql = "SELECT * FROM courses WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -36,8 +37,8 @@ public class CourseDAO {
         }
     }
 
-    private Course map(ResultSet rs) throws SQLException {
-        Course c = new Course();
+    private CourseCardView map(ResultSet rs) throws SQLException {
+        CourseCardView c = new CourseCardView();
         c.setId(rs.getInt("id"));
         c.setTitle(rs.getString("title"));
         c.setDescription(rs.getString("description"));

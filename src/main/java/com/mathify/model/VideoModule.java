@@ -2,21 +2,19 @@ package com.mathify.model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 
-/**
- * @author Nabil
- */
-public class SlideModule implements LearningModule {
+public class VideoModule implements LearningModule {
 
     private final ModuleInfo info;
-    private final List<Slide> slides;
-    private final int secondsPerSlide;
+    private final String videoUrl;
+    private final Duration duration;
+    private final String thumbnailUrl;
 
-    public SlideModule(ModuleInfo info, List<Slide> slides, int secondsPerSlide) {
+    public VideoModule(ModuleInfo info, String videoUrl, Duration duration, String thumbnailUrl) {
         this.info = info;
-        this.slides = slides;
-        this.secondsPerSlide = secondsPerSlide;
+        this.videoUrl = videoUrl;
+        this.duration = duration;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public ModuleInfo getInfo() {
@@ -45,19 +43,19 @@ public class SlideModule implements LearningModule {
 
     @Override
     public ModuleType getType() {
-        return ModuleType.SLIDE;
+        return ModuleType.VIDEO;
     }
 
     @Override
     public Duration estimatedDuration() {
-        return Duration.ofSeconds((long) slides.size() * secondsPerSlide);
+        return duration;
     }
 
-    public List<Slide> getSlides() {
-        return slides;
+    public String getVideoUrl() {
+        return videoUrl;
     }
 
-    public int getSecondsPerSlide() {
-        return secondsPerSlide;
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 }

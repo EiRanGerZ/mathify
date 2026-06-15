@@ -1,0 +1,6 @@
+package com.mathify.model;
+
+import java.time.LocalDateTime;
+
+/** Shared identity/metadata for any {@link LearningModule}. */
+public record ModuleInfo(String id, String title, int orderIndex, LocalDateTime createdAt) {}

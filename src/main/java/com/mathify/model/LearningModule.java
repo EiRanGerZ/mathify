@@ -1,55 +1,24 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mathify.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 /**
- *
- * @author Akari
+ * A learning unit inside a {@link Chapter}. Implementations (e.g. {@link SlideModule},
+ * {@link VideoModule}) carry their own payload but expose a common identity and an
+ * estimated time-to-complete so chapters can be composed polymorphically.
  */
-public class LearningModule {
+public interface LearningModule {
 
-    private String moduleId;
-    private enum Type{VIDEO, TEXT, INTERACTIVE, EXECISE};
-    private int durationMinutes;
-    private int orderIndex;
+    String getId();
 
-    public LearningModule(String id, int duration, int orderIndex){
-        moduleId = id;
-        durationMinutes = duration;
-        this.orderIndex = orderIndex;
-    }
+    String getTitle();
 
-    public void start() {
+    int getOrderIndex();
 
-        System.out.println("Module dimulai: " + moduleId);
-    }
+    LocalDateTime getCreatedAt();
 
-    public void pause() {
+    ModuleType getType();
 
-        System.out.println("Module dijeda");
-    }
-
-    public void stop() {
-
-        System.out.println("Module dihentikan");
-    }
-
-
-    public String getModuleId() {
-        return moduleId;
-    }
-
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
-    }
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
+    Duration estimatedDuration();
 }

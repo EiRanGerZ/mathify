@@ -2,19 +2,33 @@ package com.mathify.model;
 
 import java.util.UUID;
 
+/**
+ * Base profile for an authenticated user. Authentication is handled by Firebase —
+ * the server never stores credentials. Identity (uid, email, display name) arrives
+ * via {@link AuthUser} after ID-token verification; this model holds the persisted
+ * profile, keyed by the Firebase uid.
+ */
 public abstract class User {
-    public User(String name, String email, String passwordHash) {
+
+    private final String userId;
+    private String name;
+    private String email;
+
+    /** Creates a user with a generated id (for profiles not backed by a Firebase uid). */
+    protected User() {
         this.userId = UUID.randomUUID().toString();
+    }
+
+    /** Creates a user whose id is the Firebase uid. */
+    protected User(String userId, String name, String email) {
+        this.userId = userId;
         this.name = name;
         this.email = email;
-        this.passwordHash = passwordHash;
     }
 
     public String getUserId() {
         return userId;
     }
-
-    private final String userId;
 
     public String getName() {
         return name;
@@ -24,28 +38,11 @@ public abstract class User {
         this.name = name;
     }
 
-    private String name;
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    private String email;
-    private String passwordHash;
-
-    public User() {
-        this.userId = UUID.randomUUID().toString();
     }
 }

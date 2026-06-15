@@ -16,13 +16,17 @@ public class Admin extends User {
         this.role = Role.EDITOR;
     }
 
-    public Admin(String name, String email, String passwordHash) {
-        super(name, email, passwordHash);
+    public Admin(String name, String email) {
+        super();
+        setName(name);
+        setEmail(email);
         this.role = Role.EDITOR;
     }
 
-    public Admin(String name, String email, String passwordHash, Role role) {
-        super(name, email, passwordHash);
+    public Admin(String name, String email, Role role) {
+        super();
+        setName(name);
+        setEmail(email);
         this.role = role;
     }
 

@@ -13,7 +13,7 @@ public class UserProgress {
     private final Map<String, AbstractMap.SimpleEntry<Achievement, LocalDateTime>> achievements;
     private final Map<String, CourseEnrollment> courseEnrollments;
     private final Map<String, ChapterProgress> chapterProgress;
-    private final Map<String, List<QuizAttempt>> quizAttempts;
+    private final Map<String, QuizAttempt> quizAttempts;
 
     public UserProgress(String studentId) {
         this.studentId         = studentId;
@@ -106,5 +106,73 @@ public class UserProgress {
         if (enrollment == null) {
             throw new IllegalStateException("User belum terdaftar di course: " + courseId);
         }
+        if (!enrollment.isCompleted()) {
+            courseEnrollments.put(courseId, enrollment.markAsCompleted());
+        }
+    }
+
+    public boolean hasCompletedCourse(String courseId) {
+        CourseEnrollment enrollment = courseEnrollments.get(courseId);
+        return enrollment != null && enrollment.isCompleted();
+    }
+
+    public CourseEnrollment getCourseEnrollment(String courseId) {
+        return courseEnrollments.get(courseId);
+    }
+
+    public long countCompletedCourses() {
+        return courseEnrollments.values().stream()
+                .filter(CourseEnrollment::isCompleted)
+                .count();
+    }
+
+    // Progress Tracking — Chapter
+    public void completeChapter(String chapterId, Duration timeSpent) {
+        if (timeSpent == null) timeSpent = Duration.ZERO;
+        ChapterProgress existing = chapterProgress.get(chapterId);
+        if (existing == null) {
+            chapterProgress.put(chapterId, new ChapterProgress(chapterId, LocalDateTime.now(), timeSpent));
+        } else if (!existing.isCompleted()) {
+            chapterProgress.put(chapterId, existing.markAsCompleted(timeSpent));
+        }
+    }
+
+    public boolean hasCompletedChapter(String chapterId) {
+        ChapterProgress cp = chapterProgress.get(chapterId);
+        return cp != null && cp.isCompleted();
+    }
+
+    public ChapterProgress getChapterProgress(String chapterId) {
+        return chapterProgress.get(chapterId);
+    }
+
+    // Progress Tracking — Quiz
+    public void recordQuizAttempt(QuizAttempt attempt) {
+        if (attempt == null) throw new IllegalArgumentException("Quiz attempt tidak boleh null.");
+        QuizAttempt existing = quizAttempts.get(attempt.quizId());
+        // Keep the best score per quiz.
+        if (existing == null || attempt.score() > existing.score()) {
+            quizAttempts.put(attempt.quizId(), attempt);
+        }
+    }
+
+    public boolean hasAttemptedQuiz(String quizId) {
+        return quizAttempts.containsKey(quizId);
+    }
+
+    public QuizAttempt getQuizAttempt(String quizId) {
+        return quizAttempts.get(quizId);
+    }
+
+    public boolean hasPassedQuiz(String quizId, int passingScore) {
+        QuizAttempt attempt = quizAttempts.get(quizId);
+        return attempt != null && attempt.isPassed(passingScore);
+    }
+
+    public double averageQuizScore() {
+        return quizAttempts.values().stream()
+                .mapToInt(QuizAttempt::score)
+                .average()
+                .orElse(0.0);
     }
 }

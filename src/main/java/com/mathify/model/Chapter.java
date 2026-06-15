@@ -28,12 +28,12 @@ public class Chapter {
         quizzes = new ArrayList<>();
     }
 
-    public Chapter(String lessonId,
+    public Chapter(String chapterId,
                    String title,
                    String description,
                    int xpReward) {
 
-        this.chapterId = lessonId;
+        this.chapterId = chapterId;
         this.title = title;
         this.description = description;
         this.xpReward = xpReward;
@@ -73,12 +73,12 @@ public class Chapter {
         return xpReward + (modules.size() * 10);
     }
 
-    public String getLessonId() {
+    public String getId() {
         return chapterId;
     }
 
-    public void setLessonId(String lessonId) {
-        this.chapterId = lessonId;
+    public void setId(String chapterId) {
+        this.chapterId = chapterId;
     }
 
     public String getTitle() {

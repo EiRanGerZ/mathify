@@ -1,7 +1,7 @@
 package com.mathify.controller;
 
 import com.mathify.dao.CourseDAO;
-import com.mathify.model.Course;
+import com.mathify.model.CourseCardView;
 import com.mathify.model.User;
 import com.mathify.model.UserProgress;
 import jakarta.servlet.ServletException;
@@ -35,7 +35,7 @@ public class CourseLibraryServlet extends HttpServlet {
         User user         = (session != null) ? (User) session.getAttribute("user") : null;
         UserProgress prog = (session != null) ? (UserProgress) session.getAttribute("progress") : null;
 
-        List<Course> courses;
+        List<CourseCardView> courses;
         try {
             courses = new CourseDAO().findAll();
         } catch (SQLException e) {
@@ -49,11 +49,11 @@ public class CourseLibraryServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/jsp/pages/library/index.jsp").forward(req, resp);
     }
 
-    private String toJson(List<Course> courses) {
+    private String toJson(List<CourseCardView> courses) {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < courses.size(); i++) {
             if (i > 0) sb.append(",");
-            Course c = courses.get(i);
+            CourseCardView c = courses.get(i);
             sb.append("{")
               .append("\"id\":").append(c.getId()).append(",")
               .append("\"title\":\"").append(esc(c.getTitle())).append("\",")

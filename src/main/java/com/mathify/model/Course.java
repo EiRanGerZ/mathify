@@ -1,61 +1,77 @@
 package com.mathify.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Domain model for a course — its identity, category, prerequisites, and the
+ * chapters that make it up. For the lightweight summary used to render course
+ * cards in the UI, see {@link CourseCardView}.
+ */
 public class Course {
-    private int    id;
+    private String courseId;
     private String title;
     private String description;
-    private String track;
-    private String level;         // tier label e.g. "Beginner"
-    private int    levelNum;      // numeric difficulty (1–13)
-    private String color;         // UI key: green | blue | amber | plum | rose
-    private String glyph;         // decorative math symbol
-    private int    totalLessons;
-    private String es   timatedHours;
-    private int    xpReward;
-    private String status;        // new | recommended | locked
+    private String category;
+    private List<Course> prerequisite;
+    private List<Chapter> chapters;
 
-    public Course() {}
-
-    public Course(int id, String title, String description, String level) {
-        this.id          = id;
-        this.title       = title;
-        this.description = description;
-        this.level       = level;
+    public Course() {
+        this.prerequisite = new ArrayList<>();
+        this.chapters = new ArrayList<>();
     }
 
-    public int    getId()                    { return id; }
-    public void   setId(int id)              { this.id = id; }
+    public Course(String courseId, List<Chapter> chapters) {
+        this.courseId = courseId;
+        this.chapters = (chapters != null) ? chapters : new ArrayList<>();
+        this.prerequisite = new ArrayList<>();
+    }
 
-    public String getTitle()                 { return title; }
-    public void   setTitle(String t)         { this.title = t; }
+    public String getCourseId() {
+        return courseId;
+    }
 
-    public String getDescription()           { return description; }
-    public void   setDescription(String d)   { this.description = d; }
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
 
-    public String getTrack()                 { return track; }
-    public void   setTrack(String t)         { this.track = t; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getLevel()                 { return level; }
-    public void   setLevel(String l)         { this.level = l; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public int    getLevelNum()              { return levelNum; }
-    public void   setLevelNum(int n)         { this.levelNum = n; }
+    public String getDescription() {
+        return description;
+    }
 
-    public String getColor()                 { return color; }
-    public void   setColor(String c)         { this.color = c; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public String getGlyph()                 { return glyph; }
-    public void   setGlyph(String g)         { this.glyph = g; }
+    public String getCategory() {
+        return category;
+    }
 
-    public int    getTotalLessons()          { return totalLessons; }
-    public void   setTotalLessons(int n)     { this.totalLessons = n; }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-    public String getEstimatedHours()        { return estimatedHours; }
-    public void   setEstimatedHours(String h){ this.estimatedHours = h; }
+    public List<Course> getPrerequisite() {
+        return prerequisite;
+    }
 
-    public int    getXpReward()              { return xpReward; }
-    public void   setXpReward(int x)         { this.xpReward = x; }
+    public void setPrerequisite(List<Course> prerequisite) {
+        this.prerequisite = prerequisite;
+    }
 
-    public String getStatus()                { return status; }
-    public void   setStatus(String s)        { this.status = s; }
+    public List<Chapter> getChapters() {
+        return chapters;
+    }
+
+    public void setChapters(List<Chapter> chapters) {
+        this.chapters = chapters;
+    }
 }
