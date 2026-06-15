@@ -65,6 +65,12 @@ CREATE TABLE IF NOT EXISTS admins (
     created_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
+-- Bootstrap owner admin. Admins log in via Firebase; this email is the allowlist
+-- entry that grants admin access. Change it to your own Google account's email.
+INSERT INTO admins (name, email, role)
+SELECT 'Owner', 'gimerbone@gmail.com', 'OWNER'
+WHERE NOT EXISTS (SELECT 1 FROM admins WHERE email = 'gimerbone@gmail.com');
+
 -- ============================================================================
 -- Course content hierarchy
 --   courses (existing) → chapters → learning_modules → slides
@@ -263,3 +269,86 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
+
+-- ============================================================================
+-- Sample content — one fully-populated course so the content read path
+-- (Friend 2) and the progress write path (Friend 3) have real data to work
+-- against before the admin authoring UI is in use. Idempotent via stable ids
+-- + ON CONFLICT DO NOTHING. Attaches to the seeded "Differential Calculus".
+-- ============================================================================
+
+-- Chapters
+INSERT INTO chapters (chapter_id, course_id, title, description, xp_reward, order_index)
+SELECT 'ch-calc-limits', course_id, 'Limits & Continuity',
+       'What a limit is, and when a function is continuous.', 100, 0
+FROM courses WHERE title = 'Differential Calculus'
+ON CONFLICT (chapter_id) DO NOTHING;
+
+INSERT INTO chapters (chapter_id, course_id, title, description, xp_reward, order_index)
+SELECT 'ch-calc-deriv', course_id, 'Derivatives',
+       'Rates of change and the rules for differentiating.', 150, 1
+FROM courses WHERE title = 'Differential Calculus'
+ON CONFLICT (chapter_id) DO NOTHING;
+
+INSERT INTO chapter_prerequisites (chapter_id, prerequisite_id)
+VALUES ('ch-calc-deriv', 'ch-calc-limits')
+ON CONFLICT DO NOTHING;
+
+-- Learning modules for the Limits chapter
+INSERT INTO learning_modules (module_id, chapter_id, title, order_index, type)
+VALUES ('mod-limits-slides', 'ch-calc-limits', 'What is a limit?', 0, 'SLIDE')
+ON CONFLICT (module_id) DO NOTHING;
+INSERT INTO slide_modules (module_id, seconds_per_slide)
+VALUES ('mod-limits-slides', 30) ON CONFLICT (module_id) DO NOTHING;
+INSERT INTO slides (module_id, slide_order, image_url, caption) VALUES
+  ('mod-limits-slides', 1, '/assets/img/limits-1.png', 'A limit describes where a function is heading.'),
+  ('mod-limits-slides', 2, '/assets/img/limits-2.png', 'It need not equal the value at the point.'),
+  ('mod-limits-slides', 3, '/assets/img/limits-3.png', 'One-sided limits can differ.')
+ON CONFLICT (module_id, slide_order) DO NOTHING;
+
+INSERT INTO learning_modules (module_id, chapter_id, title, order_index, type)
+VALUES ('mod-limits-video', 'ch-calc-limits', 'Limits, visualized', 1, 'VIDEO')
+ON CONFLICT (module_id) DO NOTHING;
+INSERT INTO video_modules (module_id, video_url, duration_seconds, thumbnail_url)
+VALUES ('mod-limits-video', 'https://example.com/v/limits.mp4', 600, '/assets/img/limits-thumb.png')
+ON CONFLICT (module_id) DO NOTHING;
+
+-- Quiz for the Limits chapter, with one question of each type
+INSERT INTO quizzes (quiz_id, chapter_id, title, passing_score)
+VALUES ('quiz-limits', 'ch-calc-limits', 'Limits check', 2)
+ON CONFLICT (quiz_id) DO NOTHING;
+
+-- Multiple choice
+INSERT INTO questions (question_id, quiz_id, prompt, points, type, case_sensitive, order_index)
+VALUES ('q-lim-mc', 'quiz-limits', 'What is lim(x->0) of sin(x)/x?', 1, 'MULTIPLE_CHOICE', FALSE, 0)
+ON CONFLICT (question_id) DO NOTHING;
+INSERT INTO mc_options (question_id, option_id, option_text, is_correct) VALUES
+  ('q-lim-mc', 'a', '0', FALSE),
+  ('q-lim-mc', 'b', '1', TRUE),
+  ('q-lim-mc', 'c', 'undefined', FALSE)
+ON CONFLICT (question_id, option_id) DO NOTHING;
+
+-- Fill in the blank
+INSERT INTO questions (question_id, quiz_id, prompt, points, type, case_sensitive, order_index)
+VALUES ('q-lim-fb', 'quiz-limits', 'The limit of a constant c as x approaches anything is __.', 1, 'FILL_BLANK', FALSE, 1)
+ON CONFLICT (question_id) DO NOTHING;
+INSERT INTO fill_blank_answers (question_id, answer_order, answer_text)
+VALUES ('q-lim-fb', 0, 'c')
+ON CONFLICT (question_id, answer_order) DO NOTHING;
+
+-- Drag and drop
+INSERT INTO questions (question_id, quiz_id, prompt, points, type, case_sensitive, order_index)
+VALUES ('q-lim-dd', 'quiz-limits', 'Match each limit to its value.', 1, 'DRAG_AND_DROP', FALSE, 2)
+ON CONFLICT (question_id) DO NOTHING;
+INSERT INTO drag_items (question_id, item_id, label) VALUES
+  ('q-lim-dd', 'di-1', 'lim(x->2) (x + 1)'),
+  ('q-lim-dd', 'di-2', 'lim(x->0) (x)')
+ON CONFLICT (question_id, item_id) DO NOTHING;
+INSERT INTO drop_zones (question_id, zone_id, label) VALUES
+  ('q-lim-dd', 'dz-3', '3'),
+  ('q-lim-dd', 'dz-0', '0')
+ON CONFLICT (question_id, zone_id) DO NOTHING;
+INSERT INTO drag_drop_pairings (question_id, item_id, zone_id) VALUES
+  ('q-lim-dd', 'di-1', 'dz-3'),
+  ('q-lim-dd', 'di-2', 'dz-0')
+ON CONFLICT (question_id, item_id) DO NOTHING;

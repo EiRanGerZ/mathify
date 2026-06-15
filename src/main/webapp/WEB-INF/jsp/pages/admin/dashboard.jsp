@@ -575,7 +575,7 @@
       const { name, role, initial } = window.ADMIN_CONTEXT || {};
       const items = [
         { label: 'Overview', icon: <Icon.Grid/>,   active: true },
-        { label: 'Content',  icon: <Icon.Layers/>, onClick: () => notify('Content manager coming soon') },
+        { label: 'Content',  icon: <Icon.Layers/>, onClick: () => { window.location.href = ((window.ADMIN_CONTEXT || {}).ctx || '') + '/admin/content'; } },
         { label: 'Learners', icon: <Icon.Users/>,  onClick: () => notify('Learner analytics coming soon') },
         { label: 'Revenue',  icon: <Icon.Chart/>,  onClick: () => notify('Revenue detail coming soon') },
       ];
@@ -710,7 +710,7 @@
               background: 'var(--paper)', border: '1px solid var(--line)',
               color: 'var(--ink-2)', fontSize: 13, fontWeight: 600
             }}><Icon.Download/> Export</button>
-            <button onClick={() => notify('Course editor coming soon')} style={{
+            <button onClick={() => { window.location.href = ((window.ADMIN_CONTEXT || {}).ctx || '') + '/admin/content'; }} style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
               padding: '8px 14px', borderRadius: 10, cursor: 'pointer',
               background: 'var(--accent)', border: '1px solid var(--accent-deep)',

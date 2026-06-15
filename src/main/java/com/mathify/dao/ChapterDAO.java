@@ -117,4 +117,9 @@ public class ChapterDAO {
                 rs -> rs.getString("prerequisite_id"),
                 chapterId);
     }
+
+    public String findCourseIdByChapterId(String chapterId) throws SQLException {
+        String sql = "SELECT course_id FROM chapters WHERE chapter_id = ?";
+        return QueryHelper.queryOne(sql, rs -> rs.getString("course_id"), chapterId);
+    }
 }

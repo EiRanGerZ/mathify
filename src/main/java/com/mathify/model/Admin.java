@@ -30,6 +30,12 @@ public class Admin extends User {
         this.role = role;
     }
 
+    /** Reconstructs an admin from persisted state, keeping its stored id. */
+    public Admin(String id, String name, String email, Role role) {
+        super(id, name, email);
+        this.role = role;
+    }
+
     public Role getRole() {
         return role;
     }

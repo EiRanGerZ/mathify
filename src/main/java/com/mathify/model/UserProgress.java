@@ -9,6 +9,8 @@ public class UserProgress {
     private int totalXP;
     private int level;
     private int currentStreak;
+    private int energy;
+    private LocalDate lastActivity;
 
     private final Map<String, AbstractMap.SimpleEntry<Achievement, LocalDateTime>> achievements;
     private final Map<String, CourseEnrollment> courseEnrollments;
@@ -20,6 +22,8 @@ public class UserProgress {
         this.totalXP           = 0;
         this.level             = 1;
         this.currentStreak     = 0;
+        this.energy            = 5;
+        this.lastActivity      = null;
         this.achievements      = new LinkedHashMap<>();
         this.courseEnrollments = new LinkedHashMap<>();
         this.chapterProgress   = new LinkedHashMap<>();
@@ -28,10 +32,16 @@ public class UserProgress {
 
     /** Convenience constructor for loading persisted values from the database. */
     public UserProgress(String studentId, int totalXP, int level, int currentStreak) {
+        this(studentId, totalXP, level, currentStreak, 5, null);
+    }
+
+    public UserProgress(String studentId, int totalXP, int level, int currentStreak, int energy, LocalDate lastActivity) {
         this(studentId);
         this.totalXP       = totalXP;
         this.level         = level;
         this.currentStreak = currentStreak;
+        this.energy        = energy;
+        this.lastActivity  = lastActivity;
     }
 
     //Getter
@@ -174,5 +184,88 @@ public class UserProgress {
                 .mapToInt(QuizAttempt::score)
                 .average()
                 .orElse(0.0);
+    }
+
+    // Energy methods
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
+    public void decrementEnergy(int amount) {
+        if (amount <= 0) throw new IllegalArgumentException("Amount must be > 0");
+        if (this.energy < amount) {
+            throw new IllegalStateException("Not enough energy.");
+        }
+        this.energy -= amount;
+    }
+
+    public void incrementEnergy(int amount) {
+        if (amount <= 0) throw new IllegalArgumentException("Amount must be > 0");
+        this.energy += amount;
+    }
+
+    // Last activity & Streak logic
+    public LocalDate getLastActivity() {
+        return lastActivity;
+    }
+
+    public void setLastActivity(LocalDate lastActivity) {
+        this.lastActivity = lastActivity;
+    }
+
+    public void updateStreak() {
+        LocalDate today = LocalDate.now();
+        if (lastActivity == null) {
+            this.currentStreak = 1;
+        } else if (lastActivity.equals(today.minusDays(1))) {
+            this.currentStreak += 1;
+        } else if (lastActivity.isBefore(today.minusDays(1))) {
+            this.currentStreak = 1;
+        }
+        this.lastActivity = today;
+    }
+
+    // Collection Getters
+    public Map<String, CourseEnrollment> getCourseEnrollments() {
+        return courseEnrollments;
+    }
+
+    public Map<String, ChapterProgress> getChapterProgress() {
+        return chapterProgress;
+    }
+
+    public Map<String, QuizAttempt> getQuizAttempts() {
+        return quizAttempts;
+    }
+
+    // Hydration helpers
+    public void hydrateAchievement(Achievement achievement, LocalDateTime earnedAt) {
+        if (achievement == null) return;
+        achievements.put(achievement.getId(), new AbstractMap.SimpleEntry<>(achievement, earnedAt));
+    }
+
+    public void hydrateCourseEnrollments(List<CourseEnrollment> enrollmentsList) {
+        if (enrollmentsList == null) return;
+        for (CourseEnrollment e : enrollmentsList) {
+            courseEnrollments.put(e.courseId(), e);
+        }
+    }
+
+    public void hydrateChapterProgress(List<ChapterProgress> progressList) {
+        if (progressList == null) return;
+        for (ChapterProgress cp : progressList) {
+            chapterProgress.put(cp.chapterId(), cp);
+        }
+    }
+
+    public void hydrateQuizAttempts(List<QuizAttempt> attemptsList) {
+        if (attemptsList == null) return;
+        for (QuizAttempt qa : attemptsList) {
+            quizAttempts.put(qa.quizId(), qa);
+        }
     }
 }

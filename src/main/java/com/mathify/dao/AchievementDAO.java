@@ -42,4 +42,11 @@ public class AchievementDAO {
                 rs.getString("category"),
                 rs.getString("requirement"));
     }
+
+    public void seedCatalog() throws SQLException {
+        upsert(new Achievement("first_steps", "First Steps", "Learning", "Enroll in your first course"));
+        upsert(new Achievement("quiz_master", "Quiz Master", "Quiz", "Pass any quiz with a perfect score"));
+        upsert(new Achievement("streak_3", "On Fire", "Streak", "Maintain a 3-day learning streak"));
+        upsert(new Achievement("high_achiever", "High Achiever", "XP", "Earn a total of 1000 XP"));
+    }
 }

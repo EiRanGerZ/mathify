@@ -1,11 +1,15 @@
 package com.mathify.controller;
 
 import com.google.firebase.auth.FirebaseToken;
+import com.mathify.dao.AdminDAO;
 import com.mathify.dao.UserDAO;
 import com.mathify.dao.UserProgressDAO;
+import com.mathify.model.Admin;
 import com.mathify.model.AuthUser;
 import com.mathify.model.UserProgress;
 import com.mathify.util.FirebaseService;
+
+import java.time.LocalDateTime;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -43,6 +47,18 @@ public class LoginServlet extends HttpServlet {
                 decoded.getEmail(),
                 decoded.getName()
             );
+
+            // Admins authenticate through the same Firebase login; the admins table
+            // is an email allowlist. If the email is listed, start an admin session.
+            Admin admin = new AdminDAO().findByEmail(authUser.email());
+            if (admin != null) {
+                admin.setLastLoginAt(LocalDateTime.now());
+                new AdminDAO().upsert(admin);
+                HttpSession session = req.getSession(true);
+                session.setAttribute("admin", admin);
+                resp.sendRedirect(req.getContextPath() + "/admin/");
+                return;
+            }
 
             // Persist / update user record and load progress
             new UserDAO().upsert(authUser);

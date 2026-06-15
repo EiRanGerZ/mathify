@@ -10,10 +10,8 @@ import java.sql.Timestamp;
  * CRUD for backoffice {@code admins}. Unlike students, admins are not Firebase-backed;
  * their id is the {@code Admin}'s generated {@code userId}.
  *
- * <p>Note: {@code Admin} (via {@code User}) generates its {@code userId} in the
- * constructor and exposes no setter, so a reconstructed {@code Admin} will carry a
- * <em>fresh</em> id rather than the stored {@code admin_id}. Callers that need the
- * persisted id should read it separately until the model gains an id-bearing constructor.
+ * <p>Reconstruction uses {@code Admin(id, name, email, role)} so a loaded admin keeps
+ * its stored {@code admin_id} (i.e. {@code getUserId()} matches the DB row).
  */
 public class AdminDAO {
 
@@ -47,6 +45,7 @@ public class AdminDAO {
 
     static Admin map(java.sql.ResultSet rs) throws SQLException {
         Admin admin = new Admin(
+                rs.getString("admin_id"),
                 rs.getString("name"),
                 rs.getString("email"),
                 Admin.Role.valueOf(rs.getString("role")));

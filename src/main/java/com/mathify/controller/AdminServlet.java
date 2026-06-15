@@ -15,12 +15,9 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        // Access is enforced by AuthFilter (/admin/* requires an admin session).
         HttpSession session = req.getSession(false);
-//        if (session == null || session.getAttribute("admin") == null) {
-//            resp.sendRedirect(req.getContextPath() + "/login");
-//            return;
-//        }
-        Admin admin = (Admin) session.getAttribute("admin");
+        Admin admin = (session != null) ? (Admin) session.getAttribute("admin") : null;
         req.setAttribute("admin", admin);
         req.getRequestDispatcher("/WEB-INF/jsp/pages/admin/dashboard.jsp")
            .forward(req, resp);

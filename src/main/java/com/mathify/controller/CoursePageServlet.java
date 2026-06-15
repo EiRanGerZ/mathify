@@ -33,9 +33,10 @@ public class CoursePageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        // Access is enforced by AuthFilter (/course requires a student session).
         HttpSession session = req.getSession(false);
-        
-        User user         = (session != null) ? (User) session.getAttribute("user") : null;
+
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
         UserProgress prog = (session != null) ? (UserProgress) session.getAttribute("progress") : null;
 
         String courseId = req.getParameter("courseId");
@@ -71,7 +72,7 @@ public class CoursePageServlet extends HttpServlet {
         }
 
         req.getRequestDispatcher("/WEB-INF/jsp/pages/course/index.jsp")
-           .forward(req, resp);
+                .forward(req, resp);
     }
 
     private String courseToJson(CourseCardView card, Course course, UserProgress prog) {
@@ -86,20 +87,20 @@ public class CoursePageServlet extends HttpServlet {
 
         StringBuilder sb = new StringBuilder();
         sb.append("{")
-          .append("\"id\":\"").append(esc(card.getId())).append("\",")
-          .append("\"title\":\"").append(esc(card.getTitle())).append("\",")
-          .append("\"blurb\":\"").append(esc(card.getDescription())).append("\",")
-          .append("\"track\":\"").append(esc(card.getTrack())).append("\",")
-          .append("\"level\":").append(card.getLevelNum()).append(",")
-          .append("\"color\":\"").append(esc(card.getColor())).append("\",")
-          .append("\"glyph\":\"").append(esc(card.getGlyph())).append("\",")
-          .append("\"totalLessons\":").append(card.getTotalLessons()).append(",")
-          .append("\"hours\":\"").append(esc(card.getEstimatedHours())).append("\",")
-          .append("\"xp\":").append(card.getXpReward()).append(",")
-          .append("\"status\":\"").append(esc(card.getStatus())).append("\",")
-          .append("\"progress\":").append(progress).append(",")
-          .append("\"tags\":[\"Core\",\"Year 2\"]")
-          .append("}");
+                .append("\"id\":\"").append(esc(card.getId())).append("\",")
+                .append("\"title\":\"").append(esc(card.getTitle())).append("\",")
+                .append("\"blurb\":\"").append(esc(card.getDescription())).append("\",")
+                .append("\"track\":\"").append(esc(card.getTrack())).append("\",")
+                .append("\"level\":").append(card.getLevelNum()).append(",")
+                .append("\"color\":\"").append(esc(card.getColor())).append("\",")
+                .append("\"glyph\":\"").append(esc(card.getGlyph())).append("\",")
+                .append("\"totalLessons\":").append(card.getTotalLessons()).append(",")
+                .append("\"hours\":\"").append(esc(card.getEstimatedHours())).append("\",")
+                .append("\"xp\":").append(card.getXpReward()).append(",")
+                .append("\"status\":\"").append(esc(card.getStatus())).append("\",")
+                .append("\"progress\":").append(progress).append(",")
+                .append("\"tags\":[\"Core\",\"Year 2\"]")
+                .append("}");
         return sb.toString();
     }
 
@@ -108,7 +109,9 @@ public class CoursePageServlet extends HttpServlet {
         boolean courseLocked = userLevel < courseMinLevel;
 
         for (int i = 0; i < chapters.size(); i++) {
-            if (i > 0) sb.append(",");
+            if (i > 0) {
+                sb.append(",");
+            }
             Chapter ch = chapters.get(i);
 
             String status = "locked";
@@ -136,7 +139,9 @@ public class CoursePageServlet extends HttpServlet {
             int itemIdx = 0;
 
             for (LearningModule m : modules) {
-                if (itemIdx > 0) itemsSb.append(",");
+                if (itemIdx > 0) {
+                    itemsSb.append(",");
+                }
 
                 String itemStatus = "locked";
                 if (status.equals("complete")) {
@@ -158,30 +163,32 @@ public class CoursePageServlet extends HttpServlet {
                 }
 
                 itemsSb.append("{")
-                       .append("\"id\":\"").append(esc(m.getId())).append("\",")
-                       .append("\"type\":\"").append(typeStr).append("\",")
-                       .append("\"title\":\"").append(esc(m.getTitle())).append("\",")
-                       .append("\"dur\":\"").append(durStr).append("\",")
-                       .append("\"xp\":10,")
-                       .append("\"status\":\"").append(itemStatus).append("\",");
+                        .append("\"id\":\"").append(esc(m.getId())).append("\",")
+                        .append("\"type\":\"").append(typeStr).append("\",")
+                        .append("\"title\":\"").append(esc(m.getTitle())).append("\",")
+                        .append("\"dur\":\"").append(durStr).append("\",")
+                        .append("\"xp\":10,")
+                        .append("\"status\":\"").append(itemStatus).append("\",");
 
                 if (m instanceof VideoModule vm) {
                     itemsSb.append("\"details\":{")
-                           .append("\"videoUrl\":\"").append(esc(vm.getVideoUrl())).append("\",")
-                           .append("\"thumbnailUrl\":\"").append(esc(vm.getThumbnailUrl())).append("\"")
-                           .append("}");
+                            .append("\"videoUrl\":\"").append(esc(vm.getVideoUrl())).append("\",")
+                            .append("\"thumbnailUrl\":\"").append(esc(vm.getThumbnailUrl())).append("\"")
+                            .append("}");
                 } else if (m instanceof SlideModule sm) {
                     itemsSb.append("\"details\":{")
-                           .append("\"secondsPerSlide\":").append(sm.getSecondsPerSlide()).append(",")
-                           .append("\"slides\":[");
+                            .append("\"secondsPerSlide\":").append(sm.getSecondsPerSlide()).append(",")
+                            .append("\"slides\":[");
                     for (int sIdx = 0; sIdx < sm.getSlides().size(); sIdx++) {
-                        if (sIdx > 0) itemsSb.append(",");
+                        if (sIdx > 0) {
+                            itemsSb.append(",");
+                        }
                         Slide s = sm.getSlides().get(sIdx);
                         itemsSb.append("{")
-                               .append("\"order\":").append(s.order()).append(",")
-                               .append("\"imageUrl\":\"").append(esc(s.imageUrl())).append("\",")
-                               .append("\"caption\":\"").append(esc(s.caption())).append("\"")
-                               .append("}");
+                                .append("\"order\":").append(s.order()).append(",")
+                                .append("\"imageUrl\":\"").append(esc(s.imageUrl())).append("\",")
+                                .append("\"caption\":\"").append(esc(s.caption())).append("\"")
+                                .append("}");
                     }
                     itemsSb.append("]}");
                 } else {
@@ -192,7 +199,9 @@ public class CoursePageServlet extends HttpServlet {
             }
 
             for (Quiz q : quizzes) {
-                if (itemIdx > 0) itemsSb.append(",");
+                if (itemIdx > 0) {
+                    itemsSb.append(",");
+                }
 
                 String itemStatus = "locked";
                 boolean isPassed = prog != null && prog.hasAttemptedQuiz(q.getQuizId());
@@ -204,35 +213,37 @@ public class CoursePageServlet extends HttpServlet {
                 }
 
                 itemsSb.append("{")
-                       .append("\"id\":\"").append(esc(q.getQuizId())).append("\",")
-                       .append("\"type\":\"quiz\",")
-                       .append("\"title\":\"").append(esc(q.getTitle())).append("\",")
-                       .append("\"dur\":\"10m\",")
-                       .append("\"xp\":").append(q.totalPoints()).append(",")
-                       .append("\"status\":\"").append(itemStatus).append("\",")
-                       .append("\"details\":{")
-                       .append("\"passingScore\":").append(q.getPassingScore())
-                       .append("}")
-                       .append("}");
+                        .append("\"id\":\"").append(esc(q.getQuizId())).append("\",")
+                        .append("\"type\":\"quiz\",")
+                        .append("\"title\":\"").append(esc(q.getTitle())).append("\",")
+                        .append("\"dur\":\"10m\",")
+                        .append("\"xp\":").append(q.totalPoints()).append(",")
+                        .append("\"status\":\"").append(itemStatus).append("\",")
+                        .append("\"details\":{")
+                        .append("\"passingScore\":").append(q.getPassingScore())
+                        .append("}")
+                        .append("}");
                 itemIdx++;
             }
             itemsSb.append("]");
 
             sb.append("{")
-              .append("\"id\":\"").append(esc(ch.getId())).append("\",")
-              .append("\"title\":\"").append(esc(ch.getTitle())).append("\",")
-              .append("\"lessons\":").append(totalItems).append(",")
-              .append("\"done\":").append(completedItems).append(",")
-              .append("\"status\":\"").append(status).append("\",")
-              .append("\"items\":").append(itemsSb.toString())
-              .append("}");
+                    .append("\"id\":\"").append(esc(ch.getId())).append("\",")
+                    .append("\"title\":\"").append(esc(ch.getTitle())).append("\",")
+                    .append("\"lessons\":").append(totalItems).append(",")
+                    .append("\"done\":").append(completedItems).append(",")
+                    .append("\"status\":\"").append(status).append("\",")
+                    .append("\"items\":").append(itemsSb.toString())
+                    .append("}");
         }
         sb.append("]");
         return sb.toString();
     }
 
     private String esc(String s) {
-        if (s == null) return "";
+        if (s == null) {
+            return "";
+        }
         return s.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")

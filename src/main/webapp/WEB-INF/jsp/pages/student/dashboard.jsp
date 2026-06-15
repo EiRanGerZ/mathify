@@ -312,24 +312,6 @@
               Three quick lessons and you're done.
             </p>
           </div>
-          <div style={{ padding: '16px 20px', borderRadius: 20, background: 'var(--paper)', border: '1px solid var(--line)', boxShadow: 'var(--shadow-sm)', minWidth: 280 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span className="mono" style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--green-soft)', color: 'var(--green-deep)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>L{SC.level || 1}</span>
-                <div>
-                  <div style={{ fontSize: 11, color: 'var(--ink-3)', fontWeight: 600, letterSpacing: '0.04em' }}>CURRENT PATH</div>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>Calculus · Derivatives</div>
-                </div>
-              </div>
-              <a href="#" style={{ fontSize: 12, fontWeight: 600, color: 'var(--blue-deep)' }}>Change ↗</a>
-            </div>
-            <div style={{ height: 8, borderRadius: 999, background: 'var(--bg-2)', overflow: 'hidden', display: 'flex' }}>
-              <div style={{ width: '38%', background: 'var(--green)' }}/><div style={{ width: '14%', background: 'var(--blue)' }}/>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: 'var(--ink-3)', fontWeight: 600 }}>
-              <span><b style={{ color: 'var(--ink)' }}>14</b> of 26 lessons</span><span>Next: Integrals →</span>
-            </div>
-          </div>
         </div>
       </section>
     );
@@ -553,85 +535,7 @@
       </div>
     );
 
-    // ── Path snapshot ─────────────────────────────────────────────────────────
-    const PathNode = ({ node }) => {
-      const isDone = node.status === 'done', isActive = node.status === 'active';
-      const fill = isDone ? 'var(--green)' : isActive ? 'var(--paper)' : 'var(--bg-2)';
-      const ring = isDone ? 'var(--green-deep)' : isActive ? 'var(--blue)' : 'var(--line)';
-      const text = isDone ? 'white' : isActive ? 'var(--blue-deep)' : 'var(--ink-3)';
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 100, position: 'relative' }}>
-          <div style={{ position: 'relative' }}>
-            {isActive && <div style={{ position: 'absolute', inset: -8, borderRadius: 999, background: 'var(--blue)', opacity: 0.12, animation: 'pulse 2.4s ease-in-out infinite' }}/>}
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: fill, border: `${isActive ? 3 : 2}px solid ${ring}`, borderStyle: node.status === 'locked' ? 'dashed' : 'solid', display: 'flex', alignItems: 'center', justifyContent: 'center', color: text, fontWeight: 700, fontSize: 14, fontFamily: "'JetBrains Mono', monospace", position: 'relative' }}>
-              {node.status === 'locked' ? <Icon.Lock/> : isDone ? <Icon.Check/> : node.icon}
-            </div>
-          </div>
-          <div style={{ marginTop: 10, fontSize: 12, fontWeight: 700, color: node.status === 'locked' ? 'var(--ink-3)' : 'var(--ink)', textAlign: 'center' }}>{node.label}</div>
-          <div className="mono" style={{ fontSize: 10, color: 'var(--ink-3)', marginTop: 2 }}>{node.lvl}</div>
-          {isActive && <span style={{ marginTop: 6, padding: '2px 8px', borderRadius: 999, background: 'var(--blue-soft)', color: 'var(--blue-deep)', fontSize: 10, fontWeight: 700, letterSpacing: '0.04em' }}>YOU ARE HERE</span>}
-          <style>{`@keyframes pulse{0%,100%{transform:scale(1);opacity:.12}50%{transform:scale(1.15);opacity:.04}}`}</style>
-        </div>
-      );
-    };
-
-    const PathConnector = ({ from, to }) => {
-      const bothDone = from === 'done' && to === 'done', reaching = from === 'done' && to === 'active';
-      const stroke = bothDone ? 'var(--green)' : reaching ? 'var(--blue)' : 'var(--line)';
-      const dashed = from === 'locked' || to === 'locked';
-      return <div style={{ flex: 1, minWidth: 24, height: 2, background: dashed ? 'transparent' : stroke, borderTop: dashed ? `2px dashed ${stroke}` : 'none', marginTop: -38, alignSelf: 'flex-start', transform: 'translateY(32px)' }}/>;
-    };
-
-    const PathLegend = ({ color, label, outline }) => (
-      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ width: 10, height: 10, borderRadius: 999, background: outline ? 'transparent' : color, border: outline ? `1.5px dashed ${color}` : 'none' }}/>
-        {label}
-      </div>
-    );
-
-    const PathSnapshot = () => {
-      const nodes = [
-        { id: 'frac',  label: 'Fractions',    lvl: 'L1', status: 'done',   icon: '½'    },
-        { id: 'ratio', label: 'Ratios',        lvl: 'L2', status: 'done',   icon: '÷'    },
-        { id: 'alg',   label: 'Algebra',       lvl: 'L3', status: 'done',   icon: 'x'    },
-        { id: 'geo',   label: 'Geometry',      lvl: 'L4', status: 'done',   icon: '△'    },
-        { id: 'der',   label: 'Derivatives',   lvl: 'L8', status: 'active', icon: 'd/dx' },
-        { id: 'int',   label: 'Integrals',     lvl: 'L8', status: 'locked', icon: '∫'    },
-        { id: 'multi', label: 'Multivariable', lvl: 'L9', status: 'locked', icon: '∂'    },
-      ];
-      return (
-        <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 24, padding: 24, boxShadow: 'var(--shadow-sm)', position: 'relative', overflow: 'hidden' }}>
-          <div className="dot-grid" style={{ position: 'absolute', inset: 0, opacity: 0.5 }}/>
-          <div style={{ position: 'relative', zIndex: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.015em' }}>Your path</h3>
-                  <span style={{ padding: '3px 8px', borderRadius: 999, background: 'var(--green-soft)', color: 'var(--green-deep)', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>4 / 11 NODES</span>
-                </div>
-                <p style={{ margin: 0, fontSize: 13, color: 'var(--ink-3)' }}>A slice of the skill tree, centered on where you are right now.</p>
-              </div>
-              <a href="#" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: 'var(--blue-deep)' }}>Open full tree <Icon.Arrow/></a>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 0, padding: '24px 8px 8px', overflowX: 'auto' }}>
-              {nodes.map((n, i) => (
-                <React.Fragment key={n.id}>
-                  <PathNode node={n}/>
-                  {i < nodes.length - 1 && <PathConnector from={n.status} to={nodes[i+1].status}/>}
-                </React.Fragment>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 14, fontSize: 11, color: 'var(--ink-3)', marginTop: 12, justifyContent: 'center' }}>
-              <PathLegend color="var(--green)" label="Mastered"/>
-              <PathLegend color="var(--blue)"  label="In progress"/>
-              <PathLegend color="var(--ink-3)" label="Locked" outline/>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    // ── Social row ────────────────────────────────────────────────────────────
+    // ── Achievements ────────────────────────────────────────────────────────
     const AchievementBadge = ({ name, desc, date, color, icon }) => {
       const colors = { green: { bg: 'var(--green-soft)', fg: 'var(--green-deep)' }, amber: { bg: 'var(--amber-soft)', fg: 'var(--amber-deep)' }, blue: { bg: 'var(--blue-soft)', fg: 'var(--blue-deep)' }, plum: { bg: 'var(--plum-soft)', fg: 'var(--plum)' } };
       const c = colors[color];
@@ -687,48 +591,6 @@
       );
     };
 
-    const LeaderRow = ({ rank, name, xp, color, me, delta }) => (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 10, background: me ? 'var(--green-soft)' : 'transparent', border: me ? '1px solid var(--green)' : '1px solid transparent' }}>
-        <div className="mono" style={{ width: 22, fontSize: 12, fontWeight: 700, color: 'var(--ink-3)', textAlign: 'center' }}>{rank}</div>
-        <Avatar letter={name[0]} color={color} size={28}/>
-        <div style={{ flex: 1, fontSize: 14, fontWeight: me ? 700 : 600 }}>{name}</div>
-        <span style={{ fontSize: 11, color: 'var(--ink-3)', fontFamily: "'JetBrains Mono', monospace" }}>{delta}</span>
-        <span style={{ fontSize: 13, fontWeight: 700 }}>{xp.toLocaleString()} <span style={{ fontSize: 11, color: 'var(--ink-3)', fontWeight: 500 }}>XP</span></span>
-      </div>
-    );
-
-    const SocialRow = () => {
-      const leaderRows = [
-        { rank: 1, name: 'Ava L.',          xp: 2410,          color: 'var(--amber)', delta: '↑1' },
-        { rank: 2, name: SC.name || 'You',  xp: SC.xp || 1284, color: 'var(--green)', me: true, delta: '↑3' },
-        { rank: 3, name: 'Kai O.',           xp: 1190,          color: 'var(--blue)',  delta: '↓1' },
-        { rank: 4, name: 'Jordan P.',        xp: 980,           color: 'var(--plum)',  delta: '—'  },
-        { rank: 5, name: 'Sam R.',           xp: 870,           color: 'var(--ink-2)', delta: '↓2' },
-      ];
-      return (
-        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-[18px] mt-[18px]">
-          <AchievementsCard/>
-          <div style={{ background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 24, padding: 24, boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.015em' }}>Class league</h3>
-                  <span style={{ padding: '3px 8px', borderRadius: 999, background: 'var(--plum-soft)', color: 'var(--plum)', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>EMERALD · WK 21</span>
-                </div>
-                <p style={{ margin: 0, fontSize: 13, color: 'var(--ink-3)' }}>Top 3 promote on Sunday. Bottom 3 demote.</p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {leaderRows.map((r) => <LeaderRow key={r.rank} {...r}/>)}
-            </div>
-            <button style={{ marginTop: 14, width: '100%', padding: 10, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--bg)', color: 'var(--ink-2)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-              See full league →
-            </button>
-          </div>
-        </div>
-      );
-    };
-
     // ── App ───────────────────────────────────────────────────────────────────
     const App = () => (
       <div>
@@ -737,10 +599,12 @@
           <Greeting/>
           <ContinueCard/>
           <StatsRow/>
-          <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-[18px] mt-[18px]">
-            <PathSnapshot/><QuestsPanel/>
+          <div className="mt-[18px]">
+            <QuestsPanel/>
           </div>
-          <SocialRow/>
+          <div className="mt-[18px]">
+            <AchievementsCard/>
+          </div>
           <div style={{ marginTop: 40, paddingTop: 24, borderTop: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12, color: 'var(--ink-3)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Logo/><span>Mathify · v2.4 · last sync 2m ago</span></div>
             <div style={{ display: 'flex', gap: 18 }}>
