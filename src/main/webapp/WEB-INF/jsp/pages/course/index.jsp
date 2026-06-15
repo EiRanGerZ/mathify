@@ -244,77 +244,11 @@
               hours: '12h',
               xp: 1840,
               progress: 43,
-              level: 8,
-              tags: ['Core', 'Year 2'],
-            };
+            const COURSE = <%= raw(courseJson) %>;
 
-            const TYPE_META = {
-              read: { label: 'Reading', color: 'var(--blue-soft)', fg: 'var(--blue-deep)' },
-              practice: { label: 'Practice', color: 'var(--amber-soft)', fg: 'var(--amber-deep)' },
-              video: { label: 'Video', color: 'var(--plum-soft)', fg: 'var(--plum)' },
-              quiz: { label: 'Quiz', color: 'var(--rose-soft)', fg: 'var(--rose)' },
-            };
+            const TYPE_META = <%= raw(typeMetaJson) %>;
 
-            const CHAPTERS = [
-              {
-                id: 1, title: 'Limits & Continuity', lessons: 8, done: 8, status: 'complete',
-                items: [
-                  { id: 1, type: 'read', title: 'What is a limit?', dur: '5m', xp: 12, status: 'done' },
-                  { id: 2, type: 'read', title: 'One-sided limits', dur: '4m', xp: 10, status: 'done' },
-                  { id: 3, type: 'practice', title: 'Limit drills (10 problems)', dur: '10m', xp: 20, status: 'done' },
-                  { id: 4, type: 'video', title: 'Visualising ε–δ definition', dur: '4:30', xp: 10, status: 'done' },
-                  { id: 5, type: 'read', title: 'Continuity and discontinuities', dur: '6m', xp: 14, status: 'done' },
-                  { id: 6, type: 'practice', title: 'Continuity exercises', dur: '8m', xp: 18, status: 'done' },
-                  { id: 7, type: 'quiz', title: 'Chapter quiz — Limits', dur: '12m', xp: 30, status: 'done' },
-                  { id: 8, type: 'read', title: 'Limits at infinity', dur: '5m', xp: 12, status: 'done' },
-                ],
-              },
-              {
-                id: 2, title: 'Introduction to Derivatives', lessons: 10, done: 5, status: 'in-progress',
-                items: [
-                  { id: 9, type: 'read', title: 'The derivative as a slope', dur: '6m', xp: 14, status: 'done' },
-                  { id: 10, type: 'read', title: 'Derivative notation: f′, dy/dx', dur: '4m', xp: 10, status: 'done' },
-                  { id: 11, type: 'practice', title: 'Derivative from first principles', dur: '12m', xp: 22, status: 'done' },
-                  { id: 12, type: 'video', title: 'Power rule visualised', dur: '3:48', xp: 10, status: 'done' },
-                  { id: 13, type: 'read', title: 'The chain rule, intuitively', dur: '6m', xp: 14, status: 'active' },
-                  { id: 14, type: 'practice', title: 'Chain rule drills', dur: '10m', xp: 18, status: 'locked' },
-                  { id: 15, type: 'read', title: 'Product & quotient rules', dur: '7m', xp: 16, status: 'locked' },
-                  { id: 16, type: 'practice', title: 'Mixed rule practice', dur: '12m', xp: 24, status: 'locked' },
-                  { id: 17, type: 'video', title: 'Derivatives of trig functions', dur: '5:10', xp: 12, status: 'locked' },
-                  { id: 18, type: 'quiz', title: 'Chapter quiz — Derivatives', dur: '15m', xp: 35, status: 'locked' },
-                ],
-              },
-              {
-                id: 3, title: 'Applications of Derivatives', lessons: 10, done: 0, status: 'locked',
-                items: [
-                  { id: 19, type: 'read', title: 'Finding critical points', dur: '5m', xp: 12, status: 'locked' },
-                  { id: 20, type: 'read', title: 'Maxima and minima', dur: '6m', xp: 14, status: 'locked' },
-                  { id: 21, type: 'practice', title: 'Optimisation problems', dur: '15m', xp: 28, status: 'locked' },
-                  { id: 22, type: 'video', title: 'Mean Value Theorem explained', dur: '5:30', xp: 12, status: 'locked' },
-                  { id: 23, type: 'read', title: 'Concavity and inflection points', dur: '6m', xp: 14, status: 'locked' },
-                  { id: 24, type: 'practice', title: 'Curve sketching', dur: '12m', xp: 22, status: 'locked' },
-                  { id: 25, type: 'read', title: "L'Hôpital's rule", dur: '5m', xp: 12, status: 'locked' },
-                  { id: 26, type: 'practice', title: "L'Hôpital drills", dur: '8m', xp: 18, status: 'locked' },
-                  { id: 27, type: 'video', title: 'Related rates, animated', dur: '4:20', xp: 10, status: 'locked' },
-                  { id: 28, type: 'quiz', title: 'Chapter quiz — Applications', dur: '15m', xp: 35, status: 'locked' },
-                ],
-              },
-              {
-                id: 4, title: 'Introduction to Integration', lessons: 10, done: 0, status: 'locked',
-                items: [
-                  { id: 29, type: 'read', title: 'Antiderivatives and indefinite integrals', dur: '6m', xp: 14, status: 'locked' },
-                  { id: 30, type: 'read', title: 'The Fundamental Theorem of Calculus', dur: '8m', xp: 18, status: 'locked' },
-                  { id: 31, type: 'practice', title: 'Basic integration drills', dur: '10m', xp: 20, status: 'locked' },
-                  { id: 32, type: 'video', title: 'Definite integral as area', dur: '5:00', xp: 12, status: 'locked' },
-                  { id: 33, type: 'read', title: 'Substitution rule (u-sub)', dur: '6m', xp: 14, status: 'locked' },
-                  { id: 34, type: 'practice', title: 'u-substitution exercises', dur: '12m', xp: 22, status: 'locked' },
-                  { id: 35, type: 'read', title: 'Integration by parts', dur: '7m', xp: 16, status: 'locked' },
-                  { id: 36, type: 'practice', title: 'IBP drills', dur: '12m', xp: 22, status: 'locked' },
-                  { id: 37, type: 'video', title: 'Area between curves', dur: '4:45', xp: 10, status: 'locked' },
-                  { id: 38, type: 'quiz', title: 'Final chapter quiz', dur: '20m', xp: 50, status: 'locked' },
-                ],
-              },
-            ];
+            const CHAPTERS = <%= raw(chaptersJson) %>;
 
             // ── Breadcrumb ─────────────────────────────────────────────────────────────
             const Breadcrumb = () => {
