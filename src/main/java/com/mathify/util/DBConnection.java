@@ -26,6 +26,19 @@ public class DBConnection {
 
     private static final String URL = buildUrl();
 
+    static {
+        // Explicitly register the driver. Under Tomcat the bootstrap-loaded
+        // DriverManager does not reliably auto-discover JDBC drivers bundled in a
+        // webapp's WEB-INF/lib via the ServiceLoader, which surfaces as
+        // "No suitable driver found". Loading the class runs its self-registration.
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(
+                    "PostgreSQL JDBC driver not found on the classpath", e);
+        }
+    }
+
     private DBConnection() {}
 
     // -------------------------------------------------------------------------

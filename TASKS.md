@@ -6,13 +6,13 @@ remaining work is three mostly-independent slices plus payments.
 - **Friend 1 — Payments** (already assigned) → integrates via `SubscriptionDAO` / `PremiumStudent` / `Plan`.
 - **Friend 2 — Content delivery (read path)** → render courses/chapters/quizzes from the DB.
 - **Friend 3 — Progress & gamification (write path)** → the learning loop: grading, XP/streak/energy, achievements.
-- **You (lead) — Admin authoring + auth + integration** → build content creation, secure routes, own the schema, coordinate.
+- **Friend 4 — Admin authoring + auth + integration** → build content creation, secure routes, own the schema, coordinate.
 
-**Dependency order:** you author content → Friend 2 renders it → Friend 3 records progress against it. Payments run in parallel.
+**Dependency order:** Friend 4 author content → Friend 2 renders it → Friend 3 records progress against it. Payments run in parallel.
 
 ---
 
-## 👤 You (lead) — Admin authoring, auth & integration
+## 👤 Friend 4 — Admin authoring, auth & integration
 
 **Goal:** Enable content creation, secure the app, and keep the pieces fitting together.
 
@@ -52,7 +52,7 @@ remaining work is three mostly-independent slices plus payments.
 
 **Done when:** library → course page shows real chapters/modules, and opening a quiz lists real questions.
 
-**Coordinate with Friend 3:** you own `QuizServlet` GET (render), they own POST (submit).
+**Coordinate with Friend 3:** Friend 4 own `QuizServlet` GET (render), they own POST (submit).
 
 ---
 
@@ -82,7 +82,7 @@ remaining work is three mostly-independent slices plus payments.
 
 ## Shared coordination notes
 
-- **Seed data first** (you) unblocks both friends.
+- **Seed data first** (Friend 4) unblocks both friends.
 - **`QuizServlet`** is shared: Friend 2 = GET/render, Friend 3 = POST/submit.
 - **`UserProgressDAO.save`** extension (energy / last_activity) is a shared dependency — Friend 3 owns it, but Friend 1's payment flow may also touch the student record.
 - **Payment seam** (Friend 1): on successful payment, build a `PremiumStudent` and call `SubscriptionDAO.save(uid, sub)`; gate premium content on `Student.getPremium()`.
