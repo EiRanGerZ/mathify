@@ -141,6 +141,54 @@ public class CourseDAO {
                 courseId);
     }
 
+    // ── Prerequisite graph / learning paths ──────────────────────────────────
+
+    /** One directed edge of the prerequisite DAG: complete {@code prerequisiteId} before {@code courseId}. */
+    public record PrereqEdge(String courseId, String prerequisiteId) {}
+
+    /** Every prerequisite edge across the whole catalog — the skill-tree graph. */
+    public List<PrereqEdge> findAllPrerequisites() throws SQLException {
+        return QueryHelper.queryList(
+                "SELECT course_id, prerequisite_id FROM course_prerequisites",
+                rs -> new PrereqEdge(rs.getString("course_id"), rs.getString("prerequisite_id")));
+    }
+
+    /**
+     * The ordered learning path to reach {@code courseId}: every transitive
+     * prerequisite first (deepest ancestor first) followed by the course itself.
+     *
+     * <p>Computed in a single recursive CTE rather than walking the graph in
+     * Java. {@code depth} is the longest distance from the target back to each
+     * ancestor; ordering by it descending yields a valid completion order (a
+     * topological sort of the ancestor sub-DAG). The {@code depth < 20} guard
+     * stops a malformed cyclic graph from recursing forever.
+     */
+    public List<CourseCardView> findPrerequisitePath(String courseId) throws SQLException {
+        String sql = """
+                WITH RECURSIVE chain AS (
+                    SELECT prerequisite_id, 1 AS depth
+                    FROM   course_prerequisites
+                    WHERE  course_id = ?
+                  UNION ALL
+                    SELECT cp.prerequisite_id, c.depth + 1
+                    FROM   chain c
+                    JOIN   course_prerequisites cp ON cp.course_id = c.prerequisite_id
+                    WHERE  c.depth < 20
+                )
+                SELECT co.*
+                FROM (
+                    SELECT prerequisite_id AS id, MAX(depth) AS depth
+                    FROM   chain
+                    GROUP  BY prerequisite_id
+                    UNION ALL
+                    SELECT ? AS id, 0 AS depth
+                ) ord
+                JOIN courses co ON co.course_id = ord.id
+                ORDER BY ord.depth DESC, co.level_num, co.title
+                """;
+        return QueryHelper.queryList(sql, this::map, courseId, courseId);
+    }
+
     // ── CourseCardView (presentation) ─────────────────────────────────────────
 
     private CourseCardView map(ResultSet rs) throws SQLException {
