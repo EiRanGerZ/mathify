@@ -87,6 +87,24 @@ CREATE TABLE IF NOT EXISTS course_prerequisites (
     CHECK (course_id <> prerequisite_id)
 );
 
+-- Seed a small prerequisite DAG over the seeded courses so the skill tree /
+-- learning-path endpoints have edges to return. Resolved by title (the seed
+-- courses carry generated ids); idempotent via ON CONFLICT.
+--   Geometry → Trigonometry → Differential Calculus
+--   Discrete Math → Probability → Statistics
+--   Discrete Math → Number Theory
+INSERT INTO course_prerequisites (course_id, prerequisite_id)
+SELECT c.course_id, p.course_id
+FROM   courses c, courses p
+WHERE  (c.title, p.title) IN (VALUES
+    ('Trigonometry, Visualised',    'Foundations of Geometry'),
+    ('Differential Calculus',       'Trigonometry, Visualised'),
+    ('Probability & Combinatorics', 'Discrete Mathematics'),
+    ('Statistics & Data Sense',     'Probability & Combinatorics'),
+    ('Number Theory & Primes',      'Discrete Mathematics')
+)
+ON CONFLICT DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS chapters (
     chapter_id  VARCHAR(128) PRIMARY KEY,
     course_id   VARCHAR(128) NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
