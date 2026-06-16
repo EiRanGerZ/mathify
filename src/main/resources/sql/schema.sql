@@ -373,3 +373,27 @@ INSERT INTO drag_drop_pairings (question_id, item_id, zone_id) VALUES
   ('q-lim-dd', 'di-1', 'dz-3'),
   ('q-lim-dd', 'di-2', 'dz-0')
 ON CONFLICT (question_id, item_id) DO NOTHING;
+
+-- ============================================================================
+-- In-app notifications — per-user feed surfaced through the dashboard bell.
+-- Generated server-side when a domain event fires (achievement earned, level
+-- up, payment confirmed/failed). icon is a name resolved by the client Icon
+-- map; link is where clicking the notification navigates. UUID PK like admins.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS notifications (
+    notification_id UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    uid             VARCHAR(128) NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+    type            VARCHAR(30)  NOT NULL
+                                 CHECK (type IN ('ACHIEVEMENT', 'LEVEL_UP',
+                                                 'PAYMENT_CONFIRMED', 'PAYMENT_FAILED')),
+    title           VARCHAR(255) NOT NULL,
+    body            TEXT,
+    icon            VARCHAR(30),
+    link            VARCHAR(255),
+    is_read         BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_uid_created
+    ON notifications(uid, created_at DESC);

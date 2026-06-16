@@ -1,0 +1,29 @@
+/* Design tokens + base typography, shared by every page bundle.
+   Moved out of the per-page JSP <style> blocks so it lives in one place. */
+:root {
+  --bg: #FBF8F1; --bg-2: #F4EFE3;
+  --ink: #161816; --ink-2: #3A3D3A; --ink-3: #6B6E6A;
+  --line: #E6DFCC; --paper: #FFFDF7;
+  --green: #1F8A5B; --green-soft: #D7EBDF; --green-deep: #0E5A3A;
+  --blue: #3858E9;  --blue-soft:  #DEE4FB; --blue-deep:  #1F37A3;
+  --amber: #E8A23A; --amber-soft: #FBEBC8; --amber-deep: #8C5B12;
+  --plum: #6E4BB5;  --plum-soft:  #E7DEF6;
+  --rose: #D14F6B;  --rose-soft:  #FADDE3;
+  --shadow-sm: 0 1px 0 rgba(20,18,10,.04), 0 2px 6px rgba(20,18,10,.04);
+  --shadow-md: 0 2px 0 rgba(20,18,10,.05), 0 12px 28px -8px rgba(20,18,10,.12);
+  --shadow-lg: 0 4px 0 rgba(20,18,10,.06), 0 30px 60px -20px rgba(20,18,10,.18);
+}
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+}
+.mono  { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'ss01' on; }
+.serif { font-family: 'Fraunces', serif; font-style: italic; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; }
+.dot-grid {
+  background-image: radial-gradient(circle, var(--line) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+#root { min-height: 100vh; }

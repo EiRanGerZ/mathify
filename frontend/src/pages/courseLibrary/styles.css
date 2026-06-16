@@ -1,0 +1,39 @@
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --green: #1F8A5B;
+      --green-deep: #0E5A3A;
+      --green-soft: #E8F5EE;
+      --blue: #3858E9;
+      --blue-deep: #2240C4;
+      --blue-soft: #EEF1FD;
+      --amber: #E8A23A;
+      --amber-deep: #B47A1A;
+      --amber-soft: #FDF3E3;
+      --plum: #6E4BB5;
+      --plum-soft: #F0EBF9;
+      --rose: #E04A4A;
+      --rose-soft: #FDECEC;
+      --ink: #1A1A2E;
+      --ink-2: #4A4A6A;
+      --ink-3: #8A8AA0;
+      --paper: #FFFDF7;
+      --bg: #FBF9F4;
+      --bg-2: #F3F0E8;
+      --line: #E8E3D8;
+      --shadow-sm: 0 1px 3px rgba(26,26,46,0.06), 0 1px 2px rgba(26,26,46,0.04);
+      --shadow-md: 0 4px 16px rgba(26,26,46,0.10), 0 2px 4px rgba(26,26,46,0.06);
+    }
+    body {
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .serif { font-family: 'Fraunces', serif; font-style: italic; }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; }

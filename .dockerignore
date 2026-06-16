@@ -29,6 +29,7 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/vendor
+**/node_modules
 LICENSE
 README.md
 **/*.class

@@ -78,6 +78,56 @@
           <proc>none</proc>
         </configuration>
       </plugin>
+
+      <!--
+        Builds the Vite frontend (frontend/) as part of `mvn package`, so a single
+        Docker build still produces a complete WAR. The plugin downloads its own
+        Node/npm (into target/), so the Docker image needs no Node stage.
+        `npm run build` writes the bundle into src/main/webapp/assets/app, which
+        the war plugin then packages, hence the build runs in prepare-package
+        (just before the war goal).
+      -->
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.15.1</version>
+        <configuration>
+          <workingDirectory>frontend</workingDirectory>
+          <installDirectory>target</installDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-node-and-npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <nodeVersion>v20.17.0</nodeVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm-install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm-build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>prepare-package</phase>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -1,0 +1,54 @@
+/* Tailwind utilities (grid/col-span/gap classes used in the Gamification section).
+   No @tailwind base — this marketing page ships its own reset and ran with the CDN
+   preflight disabled, so we keep that behaviour. */
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --green: #1F8A5B;
+  --green-deep: #0E5A3A;
+  --green-soft: #E8F5EE;
+  --blue: #3858E9;
+  --blue-deep: #2240C4;
+  --blue-soft: #EEF1FD;
+  --amber: #E8A23A;
+  --amber-deep: #B47A1A;
+  --amber-soft: #FDF3E3;
+  --plum: #6E4BB5;
+  --plum-soft: #F0EBF9;
+  --ink: #1A1A2E;
+  --ink-2: #4A4A6A;
+  --ink-3: #8A8AA0;
+  --paper: #FFFDF7;
+  --bg: #FBF9F4;
+  --bg-2: #F3F0E8;
+  --line: #E8E3D8;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-lg: 0 20px 48px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+.serif { font-family: 'Fraunces', Georgia, serif; font-style: italic; }
+.mono  { font-family: 'JetBrains Mono', monospace; }
+
+@keyframes drift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-14px) rotate(2deg); }
+}
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+.float-card { animation: floatUp 4s ease-in-out infinite; }
+
+a { text-decoration: none; }

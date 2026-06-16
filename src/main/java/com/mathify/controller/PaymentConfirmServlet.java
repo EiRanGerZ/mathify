@@ -12,6 +12,7 @@ import com.mathify.model.PaymentStatus;
 import com.mathify.model.Plan;
 import com.mathify.model.PremiumStudent;
 import com.mathify.model.Subscribable;
+import com.mathify.service.NotificationService;
 import com.mathify.util.MidtransService;
 
 import jakarta.servlet.ServletException;
@@ -40,6 +41,7 @@ public class PaymentConfirmServlet extends HttpServlet {
 
     private final PaymentDAO paymentDAO = new PaymentDAO();
     private final SubscriptionDAO subscriptionDAO = new SubscriptionDAO();
+    private final NotificationService notificationService = new NotificationService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -93,11 +95,14 @@ public class PaymentConfirmServlet extends HttpServlet {
                 grantPremium(authUser.uid(), payment.getPlan());
                 paymentDAO.updateStatus(orderId, PaymentStatus.PAID);
                 markPremiumInSession(session, payment.getPlan());
+                // Fires exactly once: repeat returns short-circuit at the PAID guard above.
+                notificationService.notifyPaymentConfirmed(authUser.uid(), payment.getPlan());
                 redirect(req, resp, "success");
             } else if (pending) {
                 redirect(req, resp, "pending");
             } else {
                 paymentDAO.updateStatus(orderId, PaymentStatus.FAILED);
+                notificationService.notifyPaymentFailed(authUser.uid(), payment.getPlan());
                 redirect(req, resp, "failed");
             }
 

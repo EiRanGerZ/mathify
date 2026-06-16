@@ -33,6 +33,7 @@ public class ProgressService {
     private final AchievementDAO achievementDAO = new AchievementDAO();
     private final ChapterDAO chapterDAO = new ChapterDAO();
     private final CourseDAO courseDAO = new CourseDAO();
+    private final NotificationService notificationService = new NotificationService();
 
     public ProgressService() {
         // Proactively seed achievements if catalog is empty
@@ -62,10 +63,7 @@ public class ProgressService {
 
         // Update level and streak
         progress.updateStreak();
-        int newLevel = (progress.getTotalXP() / 500) + 1;
-        if (newLevel > progress.getLevel()) {
-            progress.addLevel(newLevel - progress.getLevel());
-        }
+        maybeLevelUp(uid, progress);
 
         // Save progress to DB
         progressDAO.save(uid, progress);
@@ -95,10 +93,7 @@ public class ProgressService {
 
         // Update level and streak
         progress.updateStreak();
-        int newLevel = (progress.getTotalXP() / 500) + 1;
-        if (newLevel > progress.getLevel()) {
-            progress.addLevel(newLevel - progress.getLevel());
-        }
+        maybeLevelUp(uid, progress);
 
         // Save progress to DB
         progressDAO.save(uid, progress);
@@ -152,10 +147,7 @@ public class ProgressService {
             }
 
             // Update level
-            int newLevel = (progress.getTotalXP() / 500) + 1;
-            if (newLevel > progress.getLevel()) {
-                progress.addLevel(newLevel - progress.getLevel());
-            }
+            maybeLevelUp(uid, progress);
 
             // Save progress to DB
             progressDAO.save(uid, progress);
@@ -202,6 +194,21 @@ public class ProgressService {
         Achievement achievement = achievementDAO.findById(achievementId);
         if (achievement != null) {
             progress.completeAchievement(achievement);
+            notificationService.notifyAchievement(uid, achievement);
+        }
+    }
+
+    /**
+     * Recomputes the user's level from total XP; on an increase, applies the new
+     * level and emits a level-up notification. Centralizes logic that was
+     * previously duplicated across recordQuizAttempt / completeChapter /
+     * checkAndCompleteCourse.
+     */
+    private void maybeLevelUp(String uid, UserProgress progress) {
+        int newLevel = (progress.getTotalXP() / 500) + 1;
+        if (newLevel > progress.getLevel()) {
+            progress.addLevel(newLevel - progress.getLevel());
+            notificationService.notifyLevelUp(uid, newLevel);
         }
     }
 }

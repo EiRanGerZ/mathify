@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] { display: none !important; }
+
+  :root {
+    --bg: #FBF8F1; --bg-2: #F4EFE3;
+    --ink: #161816; --ink-2: #3A3D3A; --ink-3: #6B6E6A;
+    --line: #E6DFCC; --line-2: #EFE9DA;
+    --paper: #FFFDF7; --paper-2: #FBF7EE;
+    --green: #1F8A5B; --green-soft: #D7EBDF; --green-deep: #0E5A3A;
+    --blue: #3858E9;  --blue-soft:  #DEE4FB; --blue-deep:  #1F37A3;
+    --amber: #E8A23A; --amber-soft: #FBEBC8; --amber-deep: #8C5B12;
+    --plum: #6E4BB5;  --plum-soft:  #E7DEF6; --plum-deep:  #4A2E84;
+    --rose: #D14F6B;  --rose-soft:  #FADDE3; --rose-deep:  #97304A;
+    --accent: var(--green); --accent-soft: var(--green-soft); --accent-deep: var(--green-deep);
+    --shadow-sm: 0 1px 0 rgba(20,18,10,.04), 0 2px 6px rgba(20,18,10,.04);
+    --shadow-md: 0 2px 0 rgba(20,18,10,.05), 0 12px 28px -8px rgba(20,18,10,.12);
+    --pad-card: 22px; --gap: 16px; --radius: 18px;
+  }
+  [data-theme="dark"] {
+    --bg: #14160F; --bg-2: #1C1F16;
+    --ink: #F3F0E6; --ink-2: #CBC8BC; --ink-3: #8F8E82;
+    --line: #2C2F24; --line-2: #262921;
+    --paper: #1B1E15; --paper-2: #1F2218;
+    --green-soft: #163A2A; --green-deep: #7FD3A6;
+    --blue-soft:  #1E2A52; --blue-deep:  #A9BBF6;
+    --amber-soft: #3A2E14; --amber-deep: #F0C57E;
+    --plum-soft:  #2C2148; --plum-deep:  #C8B2EE;
+    --rose-soft:  #3A1C26; --rose-deep:  #EFA6B6;
+    --shadow-sm: 0 1px 0 rgba(0,0,0,.3), 0 2px 6px rgba(0,0,0,.25);
+    --shadow-md: 0 2px 0 rgba(0,0,0,.3), 0 12px 28px -8px rgba(0,0,0,.5);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 15px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background .25s ease, color .25s ease;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'ss01' on; }
+  button { font-family: inherit; }
+  a { text-decoration: none; color: inherit; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; border: 3px solid var(--bg); }
+  #root { min-height: 100vh; }

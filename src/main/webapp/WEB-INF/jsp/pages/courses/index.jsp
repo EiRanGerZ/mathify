@@ -13,144 +13,61 @@
     String jsName   = userName.replace("\\", "\\\\").replace("\"", "\\\"");
     String ctx      = request.getContextPath();
 
-    String pageTitle = "Mathify — All Courses";
-    String activeNav = "courses";
+    String __assetBase = ctx + "/assets/app";
+    long __assetVer;
+    try {
+        String __rp = application.getRealPath("/assets/app/courses.js");
+        __assetVer = (__rp != null) ? new java.io.File(__rp).lastModified() : System.currentTimeMillis();
+    } catch (Exception e) { __assetVer = System.currentTimeMillis(); }
 %>
-<%@ include file="/WEB-INF/jsp/shared/student-shell.jspf" %>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mathify — All Courses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%= __assetBase %>/courses.css?v=<%= __assetVer %>"/>
+</head>
+<body>
+
+  <%-- Alpine toast — React dispatches `student-notify` (e.g. after enroll redirect). --%>
+  <div x-data="{ show: false, msg: '' }"
+       x-on:student-notify.window="msg = $event.detail.msg; show = true; setTimeout(() => show = false, 3500)">
+    <div x-show="show" x-cloak
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-end="opacity-0"
+         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-5 py-3 rounded-2xl text-sm font-semibold shadow-xl pointer-events-none"
+         style="background: var(--ink); color: var(--paper); border: 1px solid rgba(255,255,255,0.08);">
+      <span x-text="msg"></span>
+    </div>
+  </div>
+
+  <div id="root"></div>
 
   <script>
-    var COURSES_DATA  = <%= request.getAttribute("coursesJson")     != null ? request.getAttribute("coursesJson")     : "[]"   %>;
-    var ENROLLED_IDS  = <%= request.getAttribute("enrolledIdsJson") != null ? request.getAttribute("enrolledIdsJson") : "[]"   %>;
-    var COMPLETED_IDS = <%= request.getAttribute("completedIdsJson")!= null ? request.getAttribute("completedIdsJson"): "[]"   %>;
+    var STUDENT_CONTEXT = {
+      name:    "<%= jsName %>",
+      initial: "<%= initial %>",
+      streak:  <%= streak %>,
+      xp:      <%= totalXP %>,
+      level:   <%= level %>,
+      ctx:     "<%= ctx %>"
+    };
+    var ACTIVE_NAV    = "courses";
+    var COURSES_DATA  = <%= request.getAttribute("coursesJson")     != null ? request.getAttribute("coursesJson")     : "[]" %>;
+    var ENROLLED_IDS  = <%= request.getAttribute("enrolledIdsJson") != null ? request.getAttribute("enrolledIdsJson") : "[]" %>;
+    var COMPLETED_IDS = <%= request.getAttribute("completedIdsJson")!= null ? request.getAttribute("completedIdsJson"): "[]" %>;
   </script>
 
-  <script type="text/babel">
-    const ALL_COURSES   = window.COURSES_DATA  || [];
-    const ENROLLED_SET  = new Set(window.ENROLLED_IDS  || []);
-    const COMPLETED_SET = new Set(window.COMPLETED_IDS || []);
+  <script defer src="https://unpkg.com/alpinejs@3.14.3/dist/cdn.min.js"></script>
 
-    // ── All-courses card (browse + enroll) ─────────────────────────────────────
-    const AllCourseCard = ({ course }) => {
-      const base = SC.ctx || '';
-      const c = COLOR_MAP[course.color] || COLOR_MAP.green;
-      const enrolled  = ENROLLED_SET.has(course.id);
-      const completed = COMPLETED_SET.has(course.id);
-
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', background: 'var(--paper)', border: '1px solid var(--line)', borderRadius: 20, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ position: 'relative', height: 120, background: c.bg, overflow: 'hidden', borderBottom: '1px solid var(--line)' }}>
-            <span className="serif" style={{ position: 'absolute', left: 14, top: -24, fontSize: 160, color: c.deep, opacity: 0.2, fontWeight: 600, lineHeight: 1, pointerEvents: 'none' }}>{course.glyph}</span>
-            <div style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 6 }}>
-              {completed && (
-                <span style={{ padding: '4px 10px', borderRadius: 999, background: 'var(--green)', color: 'white', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                  <Icon.Check/> COMPLETE
-                </span>
-              )}
-              {!enrolled && course.status === 'new' && (
-                <span style={{ padding: '4px 10px', borderRadius: 999, background: 'var(--ink)', color: 'var(--paper)', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>NEW</span>
-              )}
-              {enrolled && !completed && (
-                <span style={{ padding: '4px 10px', borderRadius: 999, background: 'var(--amber-soft)', color: 'var(--amber-deep)', fontSize: 11, fontWeight: 700, letterSpacing: '0.04em' }}>ENROLLED</span>
-              )}
-            </div>
-            <div style={{ position: 'absolute', left: 14, bottom: 12 }}>
-              <span className="mono" style={{ padding: '3px 8px', borderRadius: 6, background: 'rgba(255,253,247,0.7)', backdropFilter: 'blur(4px)', fontSize: 11, fontWeight: 700, color: c.deep }}>
-                {course.track.toUpperCase()}
-              </span>
-            </div>
-          </div>
-
-          <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-            <div>
-              <h3 style={{ margin: '0 0 5px', fontSize: 16, fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.25 }}>{course.title}</h3>
-              <p style={{ margin: 0, fontSize: 13, color: 'var(--ink-3)', lineHeight: 1.45 }}>{course.blurb}</p>
-            </div>
-            <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--ink-3)', marginTop: 'auto' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon.Book/> {course.lessons} lessons</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Icon.Clock/> {flexTime(course.hours)}</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--amber-deep)' }}><Icon.Bolt/> {course.xp} XP</span>
-            </div>
-            <div style={{ paddingTop: 10, borderTop: '1px solid var(--line)' }}>
-              {enrolled ? (
-                <a href={base + '/course?courseId=' + course.id}
-                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, width: '100%', padding: '11px 16px', borderRadius: 12, background: 'var(--paper)', border: '1px solid var(--line)', color: 'var(--ink)', fontWeight: 700, fontSize: 13, textDecoration: 'none' }}
-                   onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--ink-3)'}
-                   onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--line)'}>
-                  {completed ? 'Review' : 'Continue'} <Icon.Arrow/>
-                </a>
-              ) : (
-                <form method="post" action={base + '/course/enroll'}>
-                  <input type="hidden" name="courseId" value={course.id}/>
-                  <input type="hidden" name="redirect" value="/courses"/>
-                  <button type="submit"
-                          style={{ width: '100%', padding: '11px 16px', borderRadius: 12, background: 'var(--green)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, fontFamily: 'inherit', boxShadow: '0 2px 0 var(--green-deep)' }}>
-                    <Icon.Plus/> Enroll
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    // ── All Courses (browse, search-by-category, enroll) ───────────────────────
-    const AllCourses = () => {
-      const [query, setQuery] = React.useState('');
-
-      const filtered = query.trim()
-        ? ALL_COURSES.filter(c => c.track.toLowerCase().includes(query.toLowerCase()))
-        : ALL_COURSES;
-
-      return (
-        <div style={{ marginBottom: 48 }}>
-          <SectionHeader
-            eyebrow={'ALL COURSES · ' + ALL_COURSES.length + ' AVAILABLE'}
-            title="All Courses"
-            right={<CategorySearch value={query} onChange={setQuery}/>}
-          />
-          {filtered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--ink-3)', fontSize: 14 }}>
-              No courses found for &ldquo;{query}&rdquo;.
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
-              {filtered.map(c => <AllCourseCard key={c.id} course={c}/>)}
-            </div>
-          )}
-        </div>
-      );
-    };
-
-    const CoursesApp = () => {
-      const base = SC.ctx || '';
-      useFlashMessage();
-      return (
-        <div>
-          <Nav/>
-          <main style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px 80px' }}>
-            <div style={{ marginBottom: 28 }}>
-              <span className="mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--ink-3)' }}>
-                COURSE CATALOG · {ALL_COURSES.length} COURSES
-              </span>
-              <h1 style={{ margin: '4px 0 0', fontSize: 40, fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.05 }}>
-                Every topic, <span className="serif" style={{ color: 'var(--green-deep)' }}>your way</span>.
-              </h1>
-            </div>
-
-            <AllCourses/>
-
-            <StudentFooter label="All Courses" links={[
-              { label: 'My library',        href: base + '/library' },
-              { label: 'Back to dashboard', href: base + '/dashboard' },
-            ]}/>
-          </main>
-        </div>
-      );
-    };
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<CoursesApp/>);
-  </script>
-
+  <%-- Built React island (frontend/src/pages/courses, compiled by Vite). --%>
+  <script type="module" src="<%= __assetBase %>/courses.js?v=<%= __assetVer %>"></script>
 </body>
 </html>

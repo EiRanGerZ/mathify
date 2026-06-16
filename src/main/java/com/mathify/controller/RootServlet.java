@@ -8,7 +8,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/")
+// Map to the empty string, which matches ONLY the exact context root ("/").
+// Mapping to "/" instead would replace the container's DefaultServlet and route
+// every unmapped request — including static /assets/** bundles — here, serving
+// them as text/html (which breaks the Vite island <script type="module">/<link>).
+@WebServlet("")
 public class RootServlet extends HttpServlet {
 
     @Override
