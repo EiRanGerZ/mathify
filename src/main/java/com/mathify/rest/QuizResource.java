@@ -6,11 +6,17 @@ import com.mathify.model.MultipleChoiceQuestion;
 import com.mathify.model.Question;
 import com.mathify.model.QuestionInfo;
 import com.mathify.model.Quiz;
+import com.mathify.model.Answer;
+import com.mathify.model.AuthUser;
+import com.mathify.rest.dto.request.AnswerInput;
 import com.mathify.rest.dto.request.OptionInput;
 import com.mathify.rest.dto.request.QuestionInput;
 import com.mathify.rest.dto.request.QuizInput;
+import com.mathify.rest.dto.request.QuizSubmitInput;
 import com.mathify.rest.filter.AdminSecured;
+import com.mathify.service.GamificationService;
 import com.mathify.service.QuizService;
+import com.mathify.rest.Sessions;
 import com.mathify.rest.filter.Secured;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +48,13 @@ public class QuizResource {
     private QuizService quizService;
 
     @Inject
+    private GamificationService gamificationService;
+
+    @Inject
     private QuizDAO quizDAO;
+
+    @Inject
+    private com.mathify.dao.QuizAttemptDAO quizAttemptDAO;
 
     @Inject
     private QuestionDAO questionDAO;
@@ -80,6 +92,67 @@ public class QuizResource {
         }
         
         return Response.ok(quiz).build();
+    }
+
+    @POST
+    @Path("/{quizId}/attempts")
+    @Secured
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response submitQuiz(@PathParam("quizId") String quizId, @Valid QuizSubmitInput input) {
+        AuthUser user = Sessions.currentUser(request);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+        Quiz quiz = quizService.getQuiz(quizId);
+        if (quiz == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        int scoreEarned = 0;
+        int maxScore = 0;
+
+        for (Question q : quiz.getQuestions()) {
+            maxScore += q.getPoints();
+            if (input.answers() == null) continue;
+            
+            AnswerInput ansInput = null;
+            for (AnswerInput a : input.answers()) {
+                if (q.getId().equals(a.questionId())) {
+                    ansInput = a;
+                    break;
+                }
+            }
+            
+            if (ansInput != null) {
+                Answer answer = null;
+                if (ansInput.optionId() != null) {
+                    Set<String> singleOption = new HashSet<>();
+                    singleOption.add(ansInput.optionId());
+                    answer = new Answer.MultipleChoiceAnswer(singleOption);
+                } else if (ansInput.selectedOptionIds() != null) {
+                    answer = new Answer.MultipleChoiceAnswer(ansInput.selectedOptionIds());
+                } else if (ansInput.filledValues() != null) {
+                    answer = new Answer.FillBlankAnswer(ansInput.filledValues());
+                } else if (ansInput.pairings() != null) {
+                    answer = new Answer.DragAndDropAnswer(ansInput.pairings());
+                }
+                
+                if (answer != null && q.evaluate(answer)) {
+                    scoreEarned += q.getPoints();
+                }
+            }
+        }
+
+        int finalScore = maxScore == 0 ? 0 : (int) Math.round(((double) scoreEarned / maxScore) * 100);
+
+        try {
+            com.mathify.model.QuizAttempt attempt = new com.mathify.model.QuizAttempt(quizId, finalScore, java.time.LocalDateTime.now());
+            quizAttemptDAO.record(user.uid(), attempt);
+            gamificationService.awardQuizXPAndEnergy(user.uid(), finalScore);
+            return Response.ok(attempt).build();
+        } catch (Exception e) {
+            throw new RuntimeException("DB error", e);
+        }
     }
 
     // --- Admin Quiz Endpoints ---
